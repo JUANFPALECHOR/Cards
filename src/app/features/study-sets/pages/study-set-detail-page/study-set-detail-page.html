@@ -1,0 +1,79 @@
+<a class="back-link" routerLink="/sets"><app-icon name="arrow-left" [size]="18" /> Mis conjuntos</a>
+
+@switch (status()) {
+  @case ('loading') {
+    <div class="header-skeleton" aria-busy="true" aria-label="Cargando conjunto">
+      <app-skeleton width="45%" height="2.25rem" />
+      <app-skeleton width="70%" />
+    </div>
+  }
+  @case ('not-found') {
+    <h1 class="sr-only">Conjunto no encontrado</h1>
+    <app-empty-state
+      icon="search"
+      title="No encontramos este conjunto"
+      description="Puede que se haya eliminado o que el enlace sea incorrecto."
+    >
+      <a appButton routerLink="/sets">Ir a mis conjuntos</a>
+    </app-empty-state>
+  }
+  @case ('error') {
+    <h1 class="sr-only">Error al cargar el conjunto</h1>
+    <app-empty-state
+      tone="danger"
+      icon="alert"
+      title="No pudimos cargar el conjunto"
+      [description]="error()"
+    >
+      <button appButton variant="secondary" type="button" (click)="retry()">Reintentar</button>
+    </app-empty-state>
+  }
+  @case ('ready') {
+    @if (set(); as current) {
+      <header class="header">
+        <div class="heading">
+          <h1 class="title">{{ current.name }}</h1>
+          @if (current.description; as description) {
+            <p class="description">{{ description }}</p>
+          }
+          <p class="meta">{{ wordLabel() }}</p>
+        </div>
+        <div class="manage">
+          <button appIconButton label="Editar conjunto" (click)="openEdit()">
+            <app-icon name="edit" />
+          </button>
+          <button appIconButton class="danger" label="Eliminar conjunto" (click)="remove()">
+            <app-icon name="trash" />
+          </button>
+        </div>
+      </header>
+
+      <div class="study" role="group" aria-label="Estudiar este conjunto">
+        @if (wordCount() > 0) {
+          <a appButton [routerLink]="['/sets', current.id, 'flashcards']">
+            <app-icon name="cards" [size]="18" /> Flashcards
+          </a>
+          <a appButton variant="secondary" [routerLink]="['/sets', current.id, 'quiz']">
+            <app-icon name="quiz" [size]="18" /> Cuestionario
+          </a>
+        } @else {
+          <p class="inline-note">
+            <app-icon name="info" [size]="18" /> Agrega al menos una palabra para estudiar con
+            flashcards y cuestionarios.
+          </p>
+        }
+      </div>
+
+      <app-vocabulary-panel [setId]="current.id" (countChange)="onCountChange($event)" />
+
+      <app-study-set-form-dialog
+        [open]="editing()"
+        [set]="current"
+        [saving]="saving()"
+        [serverError]="saveError()"
+        (save)="saveEdit($event)"
+        (dismissed)="closeEdit()"
+      />
+    }
+  }
+}

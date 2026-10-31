@@ -1,0 +1,204 @@
+@use 'mixins' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.counter {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+
+  strong {
+    color: var(--color-text);
+  }
+}
+
+.question {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-top: var(--space-2);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  // Nueva pregunta: entrada casi imperceptible (se repite muchas veces por cuestionario).
+  transition: opacity var(--duration-base) var(--ease-out);
+
+  @starting-style {
+    opacity: 0;
+  }
+
+  @include down(sm) {
+    padding: var(--space-5);
+  }
+}
+
+.instruction {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.prompt {
+  margin-top: calc(var(--space-3) * -1);
+  overflow-wrap: anywhere;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.options {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control-height-lg);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  text-align: start;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  @include control-text;
+  // Feedback: solo color (sin sacudidas ni rebotes).
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    opacity var(--duration-fast) ease,
+    transform var(--duration-press) var(--ease-out);
+
+  @include hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &[data-state='correct'] {
+    color: var(--color-on-success-soft);
+    background: var(--color-success-soft);
+    border-color: var(--color-success);
+  }
+
+  &[data-state='wrong'] {
+    color: var(--color-on-danger-soft);
+    background: var(--color-danger-soft);
+    border-color: var(--color-danger);
+  }
+
+  &[data-state='dimmed'] {
+    opacity: 0.6;
+  }
+}
+
+.letter {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  background: var(--color-surface-sunken);
+  border-radius: var(--radius-md);
+}
+
+.option-text {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.state-icon {
+  flex-shrink: 0;
+}
+
+.written {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  button {
+    align-self: flex-start;
+  }
+}
+
+.feedback:empty {
+  display: none;
+}
+
+.result {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+
+  app-icon {
+    margin-top: 0.15em;
+  }
+
+  &[data-outcome='correct'] {
+    color: var(--color-on-success-soft);
+    background: var(--color-success-soft);
+  }
+
+  &[data-outcome='correct-with-warning'] {
+    color: var(--color-on-warning-soft);
+    background: var(--color-warning-soft);
+  }
+
+  &[data-outcome='incorrect'] {
+    color: var(--color-on-danger-soft);
+    background: var(--color-danger-soft);
+  }
+}
+
+.answer {
+  font-weight: var(--font-weight-semibold);
+}
+
+.next {
+  align-self: stretch;
+
+  @include up(sm) {
+    align-self: flex-end;
+  }
+}
+
+@include reduced-motion {
+  .option:active:not(:disabled) {
+    transform: none;
+  }
+}

@@ -1,0 +1,188 @@
+<app-page-header
+  title="Sistema de diseño"
+  description="Tokens y componentes base de English Learning. Esta página solo existe en desarrollo."
+>
+  <app-badge tone="warning">Solo desarrollo</app-badge>
+</app-page-header>
+
+<section class="block" aria-labelledby="ds-colors">
+  <h2 id="ds-colors">Colores</h2>
+  <ul class="swatches">
+    @for (swatch of swatches; track swatch.token) {
+      <li>
+        <span class="swatch" [style.background]="'var(' + swatch.token + ')'"></span>
+        <span class="text-label">{{ swatch.name }}</span>
+        <code class="text-small text-muted">{{ swatch.token }}</code>
+      </li>
+    }
+  </ul>
+</section>
+
+<section class="block" aria-labelledby="ds-type">
+  <h2 id="ds-type">Tipografía · Poppins</h2>
+  <div class="card stack">
+    <p class="text-title">Título de página</p>
+    <p class="text-heading">Título de sección</p>
+    <p class="text-subheading">Título de tarjeta</p>
+    <p class="text-lead">Texto destacado para introducir una sección.</p>
+    <p class="text-body">Texto de lectura: cómodo para sesiones largas, con interlineado amplio.</p>
+    <p class="text-small text-muted">Texto secundario y metadatos.</p>
+    <p class="text-caption">Etiqueta en mayúsculas</p>
+    <p class="text-card" lang="en">Resilient</p>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="ds-buttons">
+  <h2 id="ds-buttons">Botones</h2>
+  <div class="card stack">
+    <div class="row">
+      <button appButton type="button">Primario</button>
+      <button appButton variant="secondary" type="button">Secundario</button>
+      <button appButton variant="ghost" type="button">Discreto</button>
+      <button appButton variant="danger" type="button">Eliminar</button>
+    </div>
+    <div class="row">
+      <button appButton size="sm" type="button">Pequeño</button>
+      <button appButton type="button"><app-icon name="plus" [size]="18" /> Nuevo conjunto</button>
+      <button appButton size="lg" type="button">Grande</button>
+    </div>
+    <div class="row">
+      <button appButton type="button" loading disabled>Guardando…</button>
+      <button appButton variant="secondary" type="button" disabled>Deshabilitado</button>
+      <button appIconButton label="Buscar" type="button"><app-icon name="search" /></button>
+      <button appIconButton label="Cerrar" size="sm" type="button">
+        <app-icon name="close" [size]="16" />
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="ds-forms">
+  <h2 id="ds-forms">Campos de formulario</h2>
+  <form class="card stack" novalidate (ngSubmit)="submit()">
+    <app-form-field label="Nombre del conjunto" [error]="nameError()" required>
+      <input appInput [formControl]="name" autocomplete="off" />
+    </app-form-field>
+    <app-form-field label="Notas" hint="Opcional. Visible solo para ti.">
+      <textarea appInput [formControl]="notes"></textarea>
+    </app-form-field>
+    <app-search-field label="Buscar conjuntos" placeholder="Buscar conjuntos…" [(value)]="query" />
+    <p class="text-small text-muted">Búsqueda actual: “{{ query() }}”</p>
+    <div class="row">
+      <button appButton type="submit">Validar</button>
+    </div>
+  </form>
+</section>
+
+<section class="block" aria-labelledby="ds-badges">
+  <h2 id="ds-badges">Etiquetas</h2>
+  <div class="card row">
+    @for (tone of tones; track tone) {
+      <app-badge [tone]="tone">{{ tone }}</app-badge>
+    }
+  </div>
+</section>
+
+<section class="block" aria-labelledby="ds-progress">
+  <h2 id="ds-progress">Progreso y carga</h2>
+  <div class="card stack">
+    <app-progress-bar [value]="progress()" label="Progreso de ejemplo" />
+    <div class="row">
+      <button appButton variant="secondary" size="sm" type="button" (click)="changeProgress(-20)">
+        −20
+      </button>
+      <button appButton variant="secondary" size="sm" type="button" (click)="changeProgress(20)">
+        +20
+      </button>
+      <span class="text-small text-muted">{{ progress() }}%</span>
+    </div>
+    <app-progress-bar [value]="100" tone="success" label="Completado" />
+    <div class="row">
+      <app-spinner label="Cargando ejemplo" />
+      <span class="text-small text-muted">Spinner con etiqueta accesible</span>
+    </div>
+    <div class="stack-tight">
+      <app-skeleton width="40%" height="1.25rem" />
+      <app-skeleton />
+      <app-skeleton width="75%" />
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="ds-feedback">
+  <h2 id="ds-feedback">Notificaciones y confirmación</h2>
+  <div class="card row">
+    <button appButton variant="secondary" type="button" (click)="showToast('success')">
+      Éxito
+    </button>
+    <button appButton variant="secondary" type="button" (click)="showToast('info')">
+      Información
+    </button>
+    <button appButton variant="secondary" type="button" (click)="showToast('error')">Error</button>
+    <button appButton variant="danger" type="button" (click)="askDelete()">
+      Confirmar eliminación
+    </button>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="ds-study">
+  <h2 id="ds-study">Estudio (datos de ejemplo)</h2>
+  <div class="card stack">
+    <app-segmented-control legend="Control segmentado" [options]="modeOptions" [(value)]="mode" />
+    <div class="study-grid">
+      <app-flashcard
+        prompt="troubleshooting"
+        answer="diagnóstico y solución de problemas"
+        promptLang="en"
+        answerLang="es"
+        promptLabel="Inglés"
+        answerLabel="Español"
+        pronunciation="TRÁ-bol-shú-ting"
+        itemId="00000000-0000-4000-8000-000000000000"
+        term="troubleshooting"
+        example="Troubleshooting the VPN took an hour."
+        context="Redes y ciberseguridad"
+        [flipped]="flipped()"
+        (toggle)="flipped.set(!flipped())"
+      />
+      <app-flashcard
+        prompt="firewall"
+        answer="cortafuegos"
+        promptLang="en"
+        answerLang="es"
+        promptLabel="Inglés"
+        answerLabel="Español"
+        example="The firewall blocked the connection."
+        flipped
+        instant
+      />
+    </div>
+    <div class="study-grid">
+      <app-stat-tile
+        label="Palabras aprendidas"
+        icon="check"
+        tone="success"
+        [value]="12"
+        caption="Ejemplo"
+      />
+      <app-stat-tile
+        label="Racha de estudio"
+        icon="flame"
+        tone="accent"
+        [value]="3"
+        caption="Ejemplo"
+      />
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="ds-empty">
+  <h2 id="ds-empty">Estado vacío</h2>
+  <app-empty-state
+    icon="stack"
+    title="Aún no tienes conjuntos"
+    description="Crea tu primer conjunto para empezar a agregar vocabulario."
+  >
+    <button appButton type="button"><app-icon name="plus" [size]="18" /> Crear conjunto</button>
+  </app-empty-state>
+</section>

@@ -1,0 +1,114 @@
+<div class="status">
+  <p class="counter">
+    Pregunta <strong>{{ index() + 1 }}</strong> de {{ total() }}
+  </p>
+  @if (question(); as q) {
+    <app-badge tone="primary">
+      {{ q.type === 'multiple-choice' ? 'Selección múltiple' : 'Respuesta escrita' }}
+    </app-badge>
+  }
+</div>
+<app-progress-bar [value]="answers().length" [max]="total()" label="Avance del cuestionario" />
+
+@for (q of current(); track q.index) {
+  <section class="question" [attr.aria-labelledby]="'quiz-prompt-' + q.index">
+    <p class="instruction">
+      {{ q.direction === 'en_es' ? 'Traduce al español' : 'Traduce al inglés' }}
+    </p>
+    <p
+      #prompt
+      class="prompt text-card"
+      tabindex="-1"
+      [id]="'quiz-prompt-' + q.index"
+      [attr.lang]="languages().prompt"
+    >
+      {{ q.prompt }}
+    </p>
+
+    @if (q.type === 'multiple-choice') {
+      <div class="options" role="group" [attr.aria-labelledby]="'quiz-prompt-' + q.index">
+        @for (option of q.options; track option; let i = $index) {
+          <button
+            type="button"
+            class="option"
+            [attr.data-state]="optionState(option)"
+            [attr.lang]="languages().answer"
+            [disabled]="!!feedback()"
+            (click)="choose(option)"
+          >
+            <span class="letter" aria-hidden="true">{{ letters[i] }}</span>
+            <span class="option-text">{{ option }}</span>
+            @switch (optionState(option)) {
+              @case ('correct') {
+                <app-icon class="state-icon" name="check" [size]="20" />
+                <span class="sr-only">(respuesta correcta)</span>
+              }
+              @case ('wrong') {
+                <app-icon class="state-icon" name="close" [size]="20" />
+                <span class="sr-only">(tu respuesta)</span>
+              }
+            }
+          </button>
+        }
+      </div>
+    } @else {
+      <form class="written" novalidate (submit)="submitWritten($event)">
+        <app-form-field label="Tu respuesta" [error]="writtenError()">
+          <input
+            #answerInput
+            appInput
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            enterkeyhint="done"
+            [attr.lang]="languages().answer"
+            [value]="written()"
+            [readOnly]="!!feedback()"
+            (input)="onWrittenInput($event)"
+          />
+        </app-form-field>
+        @if (!feedback()) {
+          <button appButton type="submit">Comprobar</button>
+        }
+      </form>
+    }
+
+    <div class="feedback" aria-live="polite">
+      @if (feedback(); as f) {
+        <div class="result" [attr.data-outcome]="f.outcome">
+          @switch (f.outcome) {
+            @case ('correct') {
+              <app-icon name="check" [size]="20" />
+              <p><strong>¡Correcto!</strong></p>
+            }
+            @case ('correct-with-warning') {
+              <app-icon name="info" [size]="20" />
+              <p>
+                <strong>Correcto.</strong> Revisa las tildes: se escribe
+                <span class="answer" [attr.lang]="languages().answer">«{{ f.matched }}»</span>.
+              </p>
+            }
+            @case ('incorrect') {
+              <app-icon name="close" [size]="20" />
+              <p>
+                <strong>Incorrecto.</strong> La respuesta correcta es
+                <span class="answer" [attr.lang]="languages().answer"
+                  >«{{ f.question.answer }}»</span
+                >.
+                @if (f.question.accepted.length > 1) {
+                  También vale: {{ f.question.accepted.slice(1).join(', ') }}.
+                }
+              </p>
+            }
+          }
+        </div>
+      }
+    </div>
+
+    @if (feedback()) {
+      <button #nextButton appButton size="lg" type="button" class="next" (click)="next()">
+        {{ isLast() ? 'Ver resultados' : 'Siguiente pregunta' }}
+      </button>
+    }
+  </section>
+}

@@ -1,1 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
+// Estilos globales de English Learning. El orden importa: tokens → temas → base → utilidades.
+@use 'fonts';
+@use 'tokens';
+@use 'themes';
+@use 'reset';
+@use 'typography';
+@use 'controls';
+@use 'utilities';

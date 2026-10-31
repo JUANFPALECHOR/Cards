@@ -1,0 +1,97 @@
+// Estilos comunes de los formularios dentro de un Modal (se referencian con styleUrl).
+@use 'mixins' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.form-error {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-on-danger-soft);
+  background: var(--color-danger-soft);
+  border-radius: var(--radius-md);
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+
+  @include up(sm) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+.optional-fields {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    list-style: none;
+    cursor: pointer;
+    border-radius: inherit;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+    @include hover {
+      background: var(--color-surface-sunken);
+    }
+  }
+
+  small {
+    display: block;
+    margin-top: var(--space-1);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-muted);
+  }
+
+  &[open] summary app-icon {
+    transform: rotate(180deg);
+  }
+}
+
+.optional-fields-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.form-actions--word {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  button {
+    padding-inline: var(--space-3);
+  }
+  .save-another {
+    grid-column: 1 / -1;
+    font-size: var(--font-size-sm);
+  }
+
+  @include down(sm) {
+    grid-template-columns: 1fr;
+    .save-word {
+      grid-row: 1;
+    }
+    .save-another {
+      grid-row: 2;
+    }
+  }
+}

@@ -1,0 +1,84 @@
+<a class="back-link" [routerLink]="['/sets', setId()]">
+  <app-icon name="arrow-left" [size]="18" /> {{ backLabel() }}
+</a>
+
+@switch (status()) {
+  @case ('loading') {
+    <div aria-busy="true" aria-label="Cargando cuestionario">
+      <app-skeleton width="40%" height="2.25rem" />
+      <app-skeleton height="16rem" radius="var(--radius-xl)" style="margin-top: var(--space-8)" />
+    </div>
+  }
+  @case ('not-found') {
+    <h1 class="sr-only">Conjunto no encontrado</h1>
+    <app-empty-state
+      icon="search"
+      title="No encontramos este conjunto"
+      description="Puede que se haya eliminado o que el enlace sea incorrecto."
+    >
+      <a appButton routerLink="/sets">Ir a mis conjuntos</a>
+    </app-empty-state>
+  }
+  @case ('error') {
+    <h1 class="sr-only">Error al cargar el cuestionario</h1>
+    <app-empty-state
+      tone="danger"
+      icon="alert"
+      title="No pudimos cargar el cuestionario"
+      [description]="error()"
+    >
+      <button appButton variant="secondary" type="button" (click)="retry()">Reintentar</button>
+    </app-empty-state>
+  }
+  @case ('ready') {
+    <app-page-header title="Cuestionario" [description]="set()?.name ?? null" />
+
+    @if (items().length === 0) {
+      <app-empty-state
+        icon="quiz"
+        title="Este conjunto aún no tiene palabras"
+        description="Agrega vocabulario al conjunto para generar cuestionarios."
+      >
+        <a appButton [routerLink]="['/sets', setId()]">Agregar palabras</a>
+      </app-empty-state>
+    } @else {
+      @switch (phase()) {
+        @case ('setup') {
+          <app-quiz-setup [items]="items()" [initial]="config()" (start)="start($event)" />
+        }
+        @case ('session') {
+          @if (notices().length > 0) {
+            <div class="notices" role="status">
+              @for (notice of notices(); track notice) {
+                <p class="inline-note">
+                  <app-icon name="info" [size]="18" /> <span>{{ notice }}</span>
+                </p>
+              }
+            </div>
+          }
+          <app-quiz-session
+            [questions]="questions()"
+            (answered)="onAnswered($event)"
+            (finished)="onFinished($event)"
+          />
+        }
+        @case ('results') {
+          @if (gains.message(); as message) {
+            <div class="notices">
+              <p class="inline-note" data-tone="success" role="status">
+                <app-icon name="star" [size]="18" /> <span>{{ message }}</span>
+              </p>
+            </div>
+          }
+          <app-quiz-results [result]="result()" [answers]="answers()">
+            <button appButton type="button" (click)="repeat()">Repetir cuestionario</button>
+            <button appButton variant="secondary" type="button" (click)="backToSetup()">
+              Cambiar configuración
+            </button>
+            <a appButton variant="ghost" [routerLink]="['/sets', setId()]">Volver al conjunto</a>
+          </app-quiz-results>
+        }
+      }
+    }
+  }
+}

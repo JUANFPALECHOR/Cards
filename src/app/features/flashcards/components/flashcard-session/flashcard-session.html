@@ -1,0 +1,62 @@
+<div class="status">
+  <p class="counter">
+    Tarjeta <strong>{{ position() + 1 }}</strong> de {{ total() }}
+  </p>
+  @if (entry()?.retry) {
+    <app-badge tone="warning">Repetición de una fallada</app-badge>
+  }
+</div>
+<app-progress-bar [value]="position()" [max]="total()" label="Avance de la sesión" />
+
+<div class="stage">
+  @for (item of current(); track item.key) {
+    <app-flashcard
+      [prompt]="promptOf(item.entry.card)"
+      [answer]="answerOf(item.entry.card)"
+      [promptLang]="languages().prompt"
+      [answerLang]="languages().answer"
+      [promptLabel]="labels().prompt"
+      [answerLabel]="labels().answer"
+      [example]="item.entry.card.example"
+      [itemId]="item.entry.card.id"
+      [term]="item.entry.card.term"
+      [pronunciation]="item.entry.card.pronunciation"
+      [context]="showSetName() ? item.entry.card.setName : null"
+      [flipped]="flipped()"
+      [instant]="instant()"
+      (toggle)="toggle($event)"
+    />
+  }
+</div>
+
+<div class="controls">
+  @if (!flipped()) {
+    <button appButton size="lg" block type="button" (click)="reveal($event)">
+      Mostrar respuesta
+    </button>
+  } @else {
+    <div class="answers" role="group" aria-label="¿Cómo te fue con esta palabra?">
+      <button appButton variant="secondary" size="lg" type="button" (click)="answer('again')">
+        <app-icon name="close" [size]="20" /> No la sabía
+      </button>
+      <button
+        appButton
+        variant="secondary"
+        size="lg"
+        type="button"
+        class="hard"
+        (click)="answer('hard')"
+      >
+        <app-icon name="wave" [size]="20" /> Me costó
+      </button>
+      <button appButton size="lg" type="button" (click)="answer('good')">
+        <app-icon name="check" [size]="20" /> La sabía
+      </button>
+    </div>
+  }
+</div>
+
+<p class="shortcuts">
+  <kbd>Espacio</kbd> girar · <kbd>1</kbd> No la sabía · <kbd>2</kbd> Me costó · <kbd>3</kbd> La
+  sabía
+</p>

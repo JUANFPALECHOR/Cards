@@ -1,0 +1,309 @@
+<app-page-header
+  title="Progreso"
+  description="Calculado con tus respuestas reales en flashcards, cuestionarios y repasos."
+/>
+
+@switch (status()) {
+  @case ('loading') {
+    <div aria-busy="true" aria-label="Cargando progreso">
+      <app-skeleton height="13rem" radius="var(--radius-xl)" />
+      <div class="grid skeleton-grid">
+        @for (item of skeletons; track item) {
+          <app-skeleton height="9rem" radius="var(--radius-xl)" />
+        }
+      </div>
+    </div>
+  }
+  @case ('error') {
+    <app-empty-state
+      tone="danger"
+      icon="alert"
+      title="No pudimos cargar tu progreso"
+      [description]="error()"
+    >
+      <button appButton variant="secondary" type="button" (click)="reload()">Reintentar</button>
+    </app-empty-state>
+  }
+  @case ('ready') {
+    @if (isEmpty()) {
+      <app-empty-state
+        icon="chart"
+        title="Aún no hay progreso que mostrar"
+        description="Crea un conjunto, agrega vocabulario y estudia: aquí verás tu avance real."
+      >
+        <a appButton routerLink="/sets">Ir a mis conjuntos</a>
+      </app-empty-state>
+    } @else if (summary(); as s) {
+      <section class="overview" aria-labelledby="overview-title">
+        <div class="overview-head">
+          <h2 id="overview-title" class="text-subheading">Tu vocabulario</h2>
+          <p class="text-small text-muted">{{ words(s.total) }} en total</p>
+        </div>
+
+        <div class="figures">
+          <div class="figure">
+            <p class="figure-value">{{ s.learnedPercent }}%</p>
+            <p class="figure-label">
+              <span class="dot" style="background: var(--color-status-learned)"></span>
+              Aprendido
+            </p>
+            <p class="figure-caption">
+              {{ s.counts.learned }} de {{ words(s.total) }} con retención comprobada
+            </p>
+          </div>
+          <div class="figure">
+            <p class="figure-value">{{ s.provisionalPercent }}%</p>
+            <p class="figure-label">
+              <span class="dot" style="background: var(--color-status-provisional)"></span>
+              Dominado provisionalmente
+            </p>
+            <p class="figure-caption">
+              {{ words(s.counts.provisional) }} que dominas; falta comprobarlas otro día
+            </p>
+          </div>
+        </div>
+
+        <app-segmented-bar
+          class="mastery-bar"
+          label="Palabras por estado de aprendizaje"
+          [segments]="segments()"
+        />
+      </section>
+
+      <div class="grid">
+        <app-stat-tile
+          label="Repasos pendientes"
+          icon="clock"
+          tone="warning"
+          [value]="s.dueNow"
+          [caption]="dueCaption()"
+        >
+          @if (s.dueNow > 0) {
+            <a appButton size="sm" variant="secondary" class="tile-action" routerLink="/review">
+              Repasar ahora
+            </a>
+          }
+        </app-stat-tile>
+        <app-stat-tile
+          label="Palabras difíciles"
+          icon="alert"
+          tone="danger"
+          [value]="s.counts.difficult"
+          [caption]="
+            s.counts.difficult > 0 ? 'Fallas con frecuencia o las olvidaste' : 'Ninguna por ahora'
+          "
+        >
+          @if (s.counts.difficult > 0) {
+            <a
+              appButton
+              size="sm"
+              variant="secondary"
+              class="tile-action"
+              routerLink="/review"
+              [queryParams]="{ mode: 'difficult' }"
+            >
+              Practicarlas
+            </a>
+          }
+        </app-stat-tile>
+        <app-stat-tile
+          label="Precisión de respuestas"
+          icon="target"
+          tone="info"
+          [value]="accuracyValue()"
+          [caption]="accuracyCaption()"
+        />
+        <app-stat-tile
+          label="Racha de estudio"
+          icon="flame"
+          tone="accent"
+          [value]="s.streak"
+          [caption]="streakCaption()"
+        />
+      </div>
+
+      @if (data(); as d) {
+        <div class="columns">
+          <section class="panel" aria-labelledby="attention-title">
+            <h2 id="attention-title" class="panel-title">
+              <app-icon name="alert" [size]="20" /> Necesitan atención
+            </h2>
+            @if (d.attention.length === 0) {
+              <p class="panel-empty">
+                Ninguna palabra te está costando especialmente. Las que falles a menudo aparecerán
+                aquí.
+              </p>
+            } @else {
+              <ul class="word-list">
+                @for (word of d.attention; track word.itemId) {
+                  <li class="word">
+                    <div class="word-main">
+                      <p>
+                        <span class="term" lang="en">{{ word.term }}</span>
+                        <span class="word-translation" lang="es">{{ word.translation }}</span>
+                      </p>
+                      <p class="word-reason">{{ reasonOf(word) }}</p>
+                    </div>
+                    <p class="word-stats">
+                      <span>{{ word.state.successes }} ✓</span>
+                      <span>{{ word.state.failures }} ✗</span>
+                      <span class="sr-only">
+                        {{ word.state.successes }} aciertos y {{ word.state.failures }} errores.
+                      </span>
+                      <span>Dominio {{ word.state.mastery }}%</span>
+                    </p>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+
+          <section class="panel" aria-labelledby="wins-title">
+            <h2 id="wins-title" class="panel-title">
+              <app-icon name="star" [size]="20" /> Logros recientes
+            </h2>
+            <h3 class="panel-subtitle">Dominadas hoy · {{ s.masteredToday }}</h3>
+            @if (d.masteredToday.length === 0) {
+              <p class="panel-empty">
+                Acierta una palabra varias veces a lo largo del día y aparecerá aquí.
+              </p>
+            } @else {
+              <ul class="chips">
+                @for (word of d.masteredToday; track word.itemId) {
+                  <li class="chip" lang="en">{{ word.term }}</li>
+                }
+              </ul>
+            }
+            <h3 class="panel-subtitle">Aprendidas recientemente</h3>
+            @if (d.recentlyLearned.length === 0) {
+              <p class="panel-empty">
+                Una palabra dominada queda aprendida cuando la recuerdas en días distintos.
+              </p>
+            } @else {
+              <ul class="chips">
+                @for (word of d.recentlyLearned; track word.itemId) {
+                  <li class="chip is-learned" lang="en">{{ word.term }}</li>
+                }
+              </ul>
+            }
+          </section>
+
+          <section class="panel" aria-labelledby="weekly-title">
+            <h2 id="weekly-title" class="panel-title">
+              <app-icon name="chart" [size]="20" /> Evolución semanal
+            </h2>
+            <app-weekly-chart [points]="d.weekly" />
+          </section>
+
+          <section class="panel" aria-labelledby="upcoming-title">
+            <h2 id="upcoming-title" class="panel-title">
+              <app-icon name="calendar" [size]="20" /> Próximos repasos
+            </h2>
+            <dl class="upcoming">
+              <div>
+                <dt>Ahora</dt>
+                <dd>{{ s.dueNow }}</dd>
+              </div>
+              <div>
+                <dt>Más tarde hoy</dt>
+                <dd>{{ s.dueLaterToday }}</dd>
+              </div>
+              <div>
+                <dt>Mañana</dt>
+                <dd>{{ s.dueTomorrow }}</dd>
+              </div>
+              <div>
+                <dt>Próximos 7 días</dt>
+                <dd>{{ s.dueWeek }}</dd>
+              </div>
+            </dl>
+            @if (s.nextDueAt; as next) {
+              <p class="panel-empty">Siguiente repaso programado: {{ dueLabel(next) }}.</p>
+            }
+          </section>
+        </div>
+
+        <section class="panel history" aria-labelledby="history-title">
+          <h2 id="history-title" class="panel-title">
+            <app-icon name="repeat" [size]="20" /> Historial reciente
+          </h2>
+          @if (d.recentAttempts.length === 0) {
+            <p class="panel-empty">Todavía no hay respuestas registradas.</p>
+          } @else {
+            <app-recent-attempts [attempts]="d.recentAttempts" />
+          }
+        </section>
+      }
+
+      <section class="criteria" aria-labelledby="criteria-title">
+        <h2 id="criteria-title" class="text-subheading">¿Cómo se calcula?</h2>
+        <dl>
+          <div>
+            <dt><span class="dot" style="background: var(--color-status-new)"></span> Nueva</dt>
+            <dd>Todavía no la has respondido en flashcards, cuestionarios ni repasos.</dd>
+          </div>
+          <div>
+            <dt>
+              <span class="dot" style="background: var(--color-status-learning)"></span> En
+              aprendizaje
+            </dt>
+            <dd>La has practicado, pero aún no demuestra suficiente dominio.</dd>
+          </div>
+          <div>
+            <dt>
+              <span class="dot" style="background: var(--color-status-difficult)"></span> Difícil
+            </dt>
+            <dd>
+              Fallas a menudo en tus intentos recientes, la olvidaste después de dominarla o te
+              cuesta en una dirección. Deja de serlo cuando la aciertas de forma constante.
+            </dd>
+          </div>
+          <div>
+            <dt>
+              <span class="dot" style="background: var(--color-status-provisional)"></span>
+              Dominada provisionalmente
+            </dt>
+            <dd>
+              La acertaste varias veces seguidas, separadas por al menos
+              {{ config.immediateWindowMinutes }} minutos y a lo largo de
+              {{ config.provisional.minSpanMinutes / 60 }} horas o más. Se consigue en un solo día;
+              repetir al instante no cuenta.
+            </dd>
+          </div>
+          <div>
+            <dt>
+              <span class="dot" style="background: var(--color-status-learned)"></span> Aprendida
+            </dt>
+            <dd>
+              Además, la recordaste sin fallar en días distintos (tras al menos
+              {{ config.learned.retentionGapHours }} horas sin verla) durante
+              {{ config.learned.minSpanDays }} días o más. Sigue apareciendo en repasos cada vez más
+              espaciados.
+            </dd>
+          </div>
+          <div>
+            <dt>Precisión</dt>
+            <dd>
+              Aciertos sobre todas tus respuestas. «Me costó» cuenta como acierto. Mide respuestas,
+              no palabras: es distinta del porcentaje aprendido.
+            </dd>
+          </div>
+          <div>
+            <dt>Tipo de pregunta</dt>
+            <dd>
+              Escribir la traducción pesa más que elegirla entre opciones. «Me costó» suma la mitad
+              que «La sabía».
+            </dd>
+          </div>
+          <div>
+            <dt>Racha</dt>
+            <dd>
+              Días seguidos con al menos una respuesta. Si hoy aún no estudiaste, la racha de ayer
+              se conserva hasta la medianoche.
+            </dd>
+          </div>
+        </dl>
+      </section>
+    }
+  }
+}

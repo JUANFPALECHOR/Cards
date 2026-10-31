@@ -1,0 +1,46 @@
+<form class="setup-form" novalidate (submit)="submit($event)">
+  <app-segmented-control legend="Tipo de preguntas" [options]="typeOptions()" [(value)]="type" />
+
+  <app-segmented-control legend="Dirección" [options]="directionOptions" [(value)]="direction" />
+
+  @if (!multipleChoiceAvailable()) {
+    <p class="inline-note" data-tone="warning">
+      <app-icon name="alert" [size]="18" />
+      <span>
+        Este conjunto no tiene al menos dos respuestas distintas en esta dirección, así que solo es
+        posible la respuesta escrita. Agrega más palabras para usar selección múltiple.
+      </span>
+    </p>
+  } @else if (type() !== 'written' && fewOptions()) {
+    <p class="inline-note">
+      <app-icon name="info" [size]="18" />
+      <span>
+        El conjunto tiene pocas respuestas distintas: algunas preguntas tendrán menos de 4 opciones.
+        No se inventan traducciones.
+      </span>
+    </p>
+  }
+
+  <div class="count">
+    <app-form-field
+      label="Cantidad de preguntas"
+      [hint]="'Entre 1 y ' + max() + ' (palabras del conjunto).'"
+      [error]="submitted() ? countError() : null"
+    >
+      <input
+        appInput
+        type="number"
+        inputmode="numeric"
+        min="1"
+        [max]="max()"
+        [value]="countText()"
+        (input)="onCountInput($event)"
+      />
+    </app-form-field>
+    <button appButton variant="ghost" size="sm" type="button" (click)="useAll()">
+      Usar todas ({{ max() }})
+    </button>
+  </div>
+
+  <button appButton size="lg" type="submit">Empezar cuestionario</button>
+</form>

@@ -1,0 +1,99 @@
+@use 'mixins' as *;
+
+:host {
+  display: block;
+}
+
+.lead {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.chart {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.plot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 7rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.bar {
+  width: min(1.5rem, 70%);
+  min-height: 2px;
+  background: color-mix(in srgb, var(--color-primary) 40%, var(--color-surface));
+  border-radius: 4px 4px 0 0;
+
+  &.is-current {
+    background: var(--color-primary);
+  }
+}
+
+.label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.is-current {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+  }
+}
+
+.tip {
+  position: absolute;
+  bottom: calc(100% + var(--space-1));
+  left: 50%;
+  z-index: 1;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-surface);
+  white-space: nowrap;
+  background: var(--color-text);
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity var(--duration-fast) ease;
+}
+
+.col:first-child .tip {
+  left: 0;
+  transform: none;
+}
+
+.col:last-child .tip {
+  right: 0;
+  left: auto;
+  transform: none;
+}
+
+.plot:hover .tip {
+  opacity: 1;
+}
+
+@include reduced-motion {
+  .tip {
+    transition: none;
+  }
+}

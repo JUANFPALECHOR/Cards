@@ -1,0 +1,88 @@
+<section class="panel" aria-labelledby="vocabulary-title">
+  <div class="header">
+    <div class="heading">
+      <h2 id="vocabulary-title" class="text-heading">Vocabulario</h2>
+      @if (status() === 'ready') {
+        <app-badge tone="primary">{{ count() }}</app-badge>
+      }
+    </div>
+    <button appButton type="button" (click)="openCreate()" [disabled]="status() === 'error'">
+      <app-icon name="plus" [size]="18" /> Agregar palabra
+    </button>
+  </div>
+
+  @switch (status()) {
+    @case ('loading') {
+      <ul class="list" aria-busy="true" aria-label="Cargando vocabulario">
+        @for (row of skeletons; track row) {
+          <li class="skeleton-row">
+            <app-skeleton width="35%" height="1.25rem" />
+            <app-skeleton width="55%" />
+          </li>
+        }
+      </ul>
+    }
+    @case ('error') {
+      <app-empty-state
+        tone="danger"
+        icon="alert"
+        title="No pudimos cargar el vocabulario"
+        [description]="error()"
+        [level]="3"
+      >
+        <button appButton variant="secondary" type="button" (click)="reload()">Reintentar</button>
+      </app-empty-state>
+    }
+    @case ('ready') {
+      @if (items().length === 0) {
+        <app-empty-state
+          icon="book"
+          title="Este conjunto aún no tiene palabras"
+          description="Agrega palabras o expresiones en inglés con su traducción para empezar a estudiar."
+          [level]="3"
+        >
+          <button appButton type="button" (click)="openCreate()">
+            <app-icon name="plus" [size]="18" /> Agregar la primera palabra
+          </button>
+        </app-empty-state>
+      } @else {
+        <app-search-field
+          class="search"
+          label="Buscar en este conjunto"
+          placeholder="Buscar palabra, traducción o nota…"
+          [(value)]="query"
+        />
+        @if (filtered().length === 0) {
+          <app-empty-state
+            icon="search"
+            title="Sin resultados"
+            [description]="'Ninguna palabra coincide con «' + query() + '».'"
+            [level]="3"
+          >
+            <button appButton variant="secondary" type="button" (click)="query.set('')">
+              Limpiar búsqueda
+            </button>
+          </app-empty-state>
+        } @else {
+          <ul class="list" aria-label="Palabras del conjunto">
+            @for (item of filtered(); track item.id) {
+              <li>
+                <app-vocabulary-row [item]="item" (edit)="openEdit(item)" (remove)="remove(item)" />
+              </li>
+            }
+          </ul>
+        }
+      }
+    }
+  }
+</section>
+
+<app-vocabulary-form-dialog
+  [open]="dialogOpen()"
+  [item]="editing()"
+  [saving]="saving()"
+  [serverError]="saveError()"
+  [resetToken]="resetToken()"
+  (save)="save($event)"
+  (dismissed)="closeDialog()"
+/>

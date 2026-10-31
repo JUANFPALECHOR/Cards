@@ -1,0 +1,115 @@
+<app-study-sets-backdrop />
+
+<header class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Aprende a tu ritmo</p>
+    <h1>Mis <span>conjuntos</span></h1>
+    <p class="intro">
+      Organiza tu vocabulario en conjuntos y practícalo con flashcards, cuestionarios y repasos
+      espaciados.
+    </p>
+  </div>
+  <app-study-sets-artwork class="hero-art" />
+  <button class="create-button" appButton type="button" (click)="openCreate()">
+    <app-icon name="plus" [size]="22" /> Nuevo conjunto
+  </button>
+</header>
+
+<section class="collection" aria-label="Tus conjuntos">
+  @switch (status()) {
+    @case ('error') {
+      <app-empty-state
+        tone="danger"
+        icon="alert"
+        title="No pudimos cargar tus conjuntos"
+        [description]="error()"
+      >
+        <button appButton variant="secondary" type="button" (click)="reload()">Reintentar</button>
+      </app-empty-state>
+    }
+    @case ('ready') {
+      @if (error(); as message) {
+        <p class="notice" role="status">{{ message }} Se muestran los últimos datos cargados.</p>
+      }
+      @if (sets().length === 0) {
+        <app-empty-state
+          icon="stack"
+          title="Aún no tienes conjuntos"
+          description="Crea tu primer conjunto, por ejemplo «Verbos en inglés» o «Redes y ciberseguridad», y agrégale palabras."
+        >
+          <button appButton type="button" (click)="openCreate()">
+            <app-icon name="plus" [size]="18" /> Crear mi primer conjunto
+          </button>
+        </app-empty-state>
+      } @else {
+        <div class="toolbar">
+          <app-search-field
+            class="search"
+            label="Buscar conjuntos"
+            placeholder="Buscar conjuntos…"
+            [(value)]="query"
+          />
+          <label class="filter">
+            <span class="sr-only">Filtrar conjuntos</span>
+            <select [ngModel]="wordFilter()" (ngModelChange)="wordFilter.set($event)">
+              <option value="all">Todos</option>
+              <option value="with-words">Con palabras</option>
+              <option value="empty">Sin palabras</option>
+            </select>
+            <app-icon class="chevron" name="chevron-down" [size]="18" />
+          </label>
+          <label class="filter sort">
+            <span class="sr-only">Ordenar conjuntos</span>
+            <app-icon class="sort-icon" name="quiz" [size]="20" />
+            <select [ngModel]="sort()" (ngModelChange)="sort.set($event)">
+              <option value="recent">Más reciente</option>
+              <option value="oldest">Más antiguo</option>
+              <option value="name">Nombre A–Z</option>
+            </select>
+            <app-icon class="chevron" name="chevron-down" [size]="18" />
+          </label>
+        </div>
+
+        <p class="sr-only" role="status">{{ filtered().length }} conjuntos encontrados</p>
+
+        @if (filtered().length === 0) {
+          <app-empty-state
+            icon="search"
+            title="Sin resultados"
+            description="No hay conjuntos que coincidan con tu búsqueda y los filtros seleccionados."
+          >
+            <button appButton variant="secondary" type="button" (click)="clearFilters()">
+              Limpiar filtros
+            </button>
+          </app-empty-state>
+        } @else {
+          <ul class="grid" aria-label="Conjuntos de estudio">
+            @for (set of filtered(); track set.id) {
+              <li><app-study-set-card [set]="set" /></li>
+            }
+          </ul>
+        }
+      }
+    }
+    @default {
+      <ul class="grid" aria-busy="true" aria-label="Cargando conjuntos">
+        @for (item of skeletons; track item) {
+          <li class="skeleton-card">
+            <app-skeleton width="2.5rem" height="2.5rem" radius="var(--radius-md)" />
+            <app-skeleton width="70%" height="1.25rem" />
+            <app-skeleton width="90%" />
+            <app-skeleton width="40%" height="0.75rem" />
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>
+
+<app-study-set-form-dialog
+  [open]="creating()"
+  [saving]="saving()"
+  [serverError]="saveError()"
+  (save)="create($event)"
+  (dismissed)="closeCreate()"
+/>

@@ -1,0 +1,128 @@
+<app-modal
+  size="md"
+  [open]="open()"
+  [title]="item() ? 'Editar palabra' : 'Agregar palabra'"
+  [description]="
+    item()
+      ? 'Ajusta la palabra, su traducción o los detalles que te ayudan a recordarla.'
+      : 'Escribe la palabra en inglés y su traducción. Los demás detalles son opcionales.'
+  "
+  [dismissDisabled]="saving()"
+  (closeRequested)="dismissed.emit()"
+>
+  <form class="form" [formGroup]="form" (ngSubmit)="submit(false)" novalidate>
+    <app-form-field label="Palabra o expresión en inglés" [error]="termError()" required>
+      <input
+        #termInput
+        appInput
+        formControlName="term"
+        lang="en"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        autofocus
+        enterkeyhint="next"
+        [attr.maxlength]="limits.term"
+        placeholder="Por ejemplo: firewall"
+      />
+    </app-form-field>
+
+    <app-form-field
+      label="Traducción al español"
+      hint="Si tiene varias traducciones válidas, sepáralas con «/» o «;»."
+      [error]="translationError()"
+      required
+    >
+      <input
+        appInput
+        formControlName="translation"
+        lang="es"
+        autocomplete="off"
+        enterkeyhint="done"
+        [attr.maxlength]="limits.translation"
+        placeholder="Por ejemplo: cortafuegos"
+      />
+    </app-form-field>
+
+    <details
+      class="optional-fields"
+      [open]="!!item() || !!pronunciationError() || !!exampleError() || !!notesError()"
+    >
+      <summary>
+        <span>Más detalles <small>Pronunciación, ejemplo y notas · Opcional</small></span>
+        <app-icon name="chevron-down" [size]="20" />
+      </summary>
+      <div class="optional-fields-content">
+        <app-form-field
+          label="Pronunciación aproximada (opcional)"
+          hint="Cómo suena, escrito para hispanohablantes. La sílaba acentuada va en MAYÚSCULAS."
+          [error]="pronunciationError()"
+        >
+          <input
+            appInput
+            formControlName="pronunciation"
+            lang="es"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            enterkeyhint="next"
+            [attr.maxlength]="limits.pronunciation"
+            placeholder="Por ejemplo: TRÁ-bol-shú-ting"
+          />
+        </app-form-field>
+
+        <app-form-field label="Oración de ejemplo" hint="Opcional." [error]="exampleError()">
+          <textarea
+            appInput
+            formControlName="example"
+            lang="en"
+            rows="2"
+            [attr.maxlength]="limits.example"
+            placeholder="Por ejemplo: The firewall protects the network."
+          ></textarea>
+        </app-form-field>
+
+        <app-form-field label="Notas personales" hint="Opcional." [error]="notesError()">
+          <textarea
+            appInput
+            formControlName="notes"
+            rows="2"
+            [attr.maxlength]="limits.notes"
+            placeholder="Una pista o asociación que te ayude a recordar esta palabra."
+          ></textarea>
+        </app-form-field>
+      </div>
+    </details>
+
+    @if (serverError(); as message) {
+      <p class="form-error" role="alert">{{ message }}</p>
+    }
+
+    <div class="form-actions form-actions--word">
+      <button
+        appButton
+        variant="secondary"
+        type="button"
+        [disabled]="saving()"
+        (click)="dismissed.emit()"
+      >
+        Cancelar
+      </button>
+      <button class="save-word" appButton type="submit" [loading]="saving()" [disabled]="saving()">
+        {{ item() ? 'Guardar cambios' : 'Guardar palabra' }}
+      </button>
+      @if (!item()) {
+        <button
+          class="save-another"
+          appButton
+          variant="ghost"
+          type="button"
+          [disabled]="saving()"
+          (click)="submit(true)"
+        >
+          <app-icon name="plus" [size]="18" /> Guardar y agregar otra
+        </button>
+      }
+    </div>
+  </form>
+</app-modal>

@@ -1,0 +1,65 @@
+@use 'mixins' as *;
+
+.header-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.title {
+  overflow-wrap: anywhere;
+}
+
+.description {
+  max-width: 60ch;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-subtle);
+}
+
+.manage {
+  display: flex;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.danger {
+  @include hover {
+    color: var(--color-on-danger-soft);
+    background: var(--color-danger-soft);
+  }
+}
+
+.study {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-6) 0 var(--space-10);
+
+  a {
+    flex: 1 1 10rem;
+
+    @include up(sm) {
+      flex: 0 0 auto;
+    }
+  }
+}

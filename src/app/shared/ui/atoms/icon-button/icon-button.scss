@@ -1,0 +1,49 @@
+@use 'mixins' as *;
+
+:host {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  padding: 0;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+  @include control-text;
+  transition:
+    transform var(--duration-press) var(--ease-out),
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+
+  @include hover {
+    color: var(--color-text);
+    background: var(--color-surface-sunken);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.94);
+  }
+}
+
+:host([data-size='sm']) {
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+  border-radius: var(--radius-sm);
+
+  // El área táctil sigue siendo de 44px aunque el botón se vea más pequeño.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+  }
+}
+
+@include reduced-motion {
+  :host(:active:not(:disabled)) {
+    transform: none;
+  }
+}

@@ -1,0 +1,190 @@
+@use 'mixins' as *;
+
+// Giro: movimiento en pantalla → ease-in-out fuerte, 300ms (límite de la UI).
+// Entrada de cada tarjeta nueva: opacidad + escala mínima, 200ms ease-out, casi imperceptible
+// porque se repite decenas de veces por sesión.
+
+:host {
+  position: relative;
+  display: block;
+}
+
+.scene {
+  display: block;
+  width: 100%;
+  padding: 0;
+  color: inherit;
+  text-align: center;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-xl);
+  perspective: 1400px;
+  cursor: pointer;
+  touch-action: manipulation;
+  @include control-text;
+  transition:
+    transform var(--duration-press) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &:focus-visible {
+    outline-offset: 4px;
+  }
+}
+
+.inner {
+  position: relative;
+  display: block;
+  min-height: clamp(15rem, 42dvh, 22rem);
+  transform-style: preserve-3d;
+  transition: transform 300ms var(--ease-in-out);
+
+  .is-flipped & {
+    transform: rotateY(180deg);
+  }
+
+  [data-instant] & {
+    transition: none;
+  }
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  overflow: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.back {
+  transform: rotateY(180deg);
+  background: linear-gradient(180deg, var(--color-primary-soft), var(--color-surface) 60%);
+}
+
+.context {
+  position: absolute;
+  top: var(--space-4);
+  inset-inline: var(--space-4);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.text {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.pronunciation {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+// Audio superpuesto en la esquina, fuera del botón de la tarjeta.
+// Aparece con un fundido corto; tras un giro espera a que la cara en inglés ya esté a la vista.
+.audio {
+  position: absolute;
+  top: var(--space-3);
+  inset-inline-end: var(--space-3);
+  z-index: 1;
+  transition: opacity 200ms var(--ease-out) 150ms;
+
+  @starting-style {
+    opacity: 0;
+  }
+
+  &[data-instant] {
+    transition-delay: 0s;
+  }
+}
+
+// Deja sitio al audio: el nombre del conjunto se recorta simétricamente para seguir centrado.
+:host(.has-audio) .context {
+  inset-inline: 6.5rem;
+}
+
+.hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.example {
+  max-width: 36ch;
+  font-size: var(--font-size-md);
+  font-style: italic;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+// Movimiento reducido: sin giro ni escala; las caras se funden.
+@include reduced-motion {
+  .scene,
+  .scene:active {
+    transform: none;
+  }
+
+  @starting-style {
+    .scene {
+      transform: none;
+    }
+  }
+
+  .inner,
+  .is-flipped .inner {
+    transform: none;
+    transition: none;
+  }
+
+  .face {
+    transition: opacity var(--duration-base) ease;
+  }
+
+  .back {
+    transform: none;
+    opacity: 0;
+  }
+
+  .is-flipped .front {
+    opacity: 0;
+  }
+
+  .is-flipped .back {
+    opacity: 1;
+  }
+
+  [data-instant] .face {
+    transition: none;
+  }
+}

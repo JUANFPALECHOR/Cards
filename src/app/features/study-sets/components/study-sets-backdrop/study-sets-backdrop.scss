@@ -1,0 +1,109 @@
+:host {
+  position: fixed;
+  z-index: -1;
+  inset: var(--topbar-height) 0 0;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  background: radial-gradient(ellipse at 38% 32%, var(--color-surface), transparent 74%);
+}
+
+.ribbon {
+  position: absolute;
+  border: clamp(3rem, 6vw, 6.25rem) solid
+    color-mix(in srgb, var(--color-primary-soft) 85%, transparent);
+  border-radius: 50%;
+}
+
+.ribbon-upper {
+  width: 45rem;
+  height: 38rem;
+  right: -33rem;
+  bottom: 6rem;
+  transform: rotate(-42deg);
+}
+
+.ribbon-middle {
+  width: 37rem;
+  height: 26rem;
+  right: -1rem;
+  bottom: -3rem;
+  transform: rotate(-28deg);
+  border-color: color-mix(in srgb, var(--color-primary-soft) 75%, transparent);
+}
+
+.ribbon-lower {
+  width: 50rem;
+  height: 28rem;
+  right: -5rem;
+  bottom: -17rem;
+  transform: rotate(-25deg);
+}
+
+.cat,
+.accent {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .cat {
+    position: absolute;
+    display: block;
+    width: clamp(24rem, 34vw, 35rem);
+    aspect-ratio: 1146 / 1373;
+    right: -6rem;
+    bottom: -4rem;
+    background: url('/images/study-cat.png') center / contain no-repeat;
+  }
+
+  .accent {
+    position: absolute;
+    display: block;
+    width: 2.5rem;
+    height: 3rem;
+    color: color-mix(in srgb, var(--color-primary) 55%, var(--color-surface));
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 0.3rem;
+      height: 2rem;
+      border-radius: 1rem;
+      background: currentColor;
+    }
+    &::before {
+      right: 0;
+      transform: rotate(-22deg);
+    }
+    &::after {
+      left: 0;
+      bottom: -0.5rem;
+      transform: rotate(-72deg);
+    }
+  }
+
+  .accent-upper {
+    right: 24vw;
+    bottom: 46%;
+  }
+  .accent-lower {
+    right: 29vw;
+    bottom: 20%;
+  }
+}
+
+@media (max-width: 63.99rem) {
+  .ribbon {
+    opacity: 0.4;
+  }
+  .ribbon-upper,
+  .ribbon-lower {
+    display: none;
+  }
+  .ribbon-middle {
+    right: -24rem;
+    bottom: -8rem;
+  }
+}

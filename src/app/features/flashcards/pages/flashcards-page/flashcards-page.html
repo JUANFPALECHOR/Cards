@@ -1,0 +1,84 @@
+<a class="back-link" [routerLink]="['/sets', setId()]">
+  <app-icon name="arrow-left" [size]="18" /> {{ backLabel() }}
+</a>
+
+@switch (status()) {
+  @case ('loading') {
+    <div aria-busy="true" aria-label="Cargando tarjetas">
+      <app-skeleton width="40%" height="2.25rem" />
+      <app-skeleton height="18rem" radius="var(--radius-xl)" style="margin-top: var(--space-8)" />
+    </div>
+  }
+  @case ('not-found') {
+    <h1 class="sr-only">Conjunto no encontrado</h1>
+    <app-empty-state
+      icon="search"
+      title="No encontramos este conjunto"
+      description="Puede que se haya eliminado o que el enlace sea incorrecto."
+    >
+      <a appButton routerLink="/sets">Ir a mis conjuntos</a>
+    </app-empty-state>
+  }
+  @case ('error') {
+    <h1 class="sr-only">Error al cargar las tarjetas</h1>
+    <app-empty-state
+      tone="danger"
+      icon="alert"
+      title="No pudimos cargar las tarjetas"
+      [description]="error()"
+    >
+      <button appButton variant="secondary" type="button" (click)="retry()">Reintentar</button>
+    </app-empty-state>
+  }
+  @case ('ready') {
+    <app-page-header title="Flashcards" [description]="set()?.name ?? null" />
+
+    @if (cards().length === 0) {
+      <app-empty-state
+        icon="cards"
+        title="Este conjunto aún no tiene palabras"
+        description="Agrega vocabulario al conjunto para estudiar con flashcards."
+      >
+        <a appButton [routerLink]="['/sets', setId()]">Agregar palabras</a>
+      </app-empty-state>
+    } @else {
+      @switch (phase()) {
+        @case ('setup') {
+          <app-study-setup [cardCount]="cards().length" [(direction)]="direction" (start)="start()">
+            <p class="inline-note">
+              <app-icon name="info" [size]="18" />
+              <span>
+                Tus respuestas actualizan el dominio de cada palabra y cuándo volverá a aparecer en
+                <a routerLink="/review">Repasar</a>. Girar la tarjeta no cuenta como acierto.
+              </span>
+            </p>
+          </app-study-setup>
+        }
+        @case ('session') {
+          <app-flashcard-session
+            [cards]="sessionCards()"
+            [direction]="direction()"
+            (answered)="onAnswered($event)"
+            (finished)="onFinished($event)"
+          />
+        }
+        @case ('summary') {
+          @if (summary(); as result) {
+            <app-session-summary [summary]="result">
+              @if (gains.message(); as message) {
+                <p summaryNote class="inline-note" data-tone="success" role="status">
+                  <app-icon name="star" [size]="18" /> <span>{{ message }}</span>
+                </p>
+              }
+              <button appButton type="button" (click)="start()">Estudiar de nuevo</button>
+              <button appButton variant="secondary" type="button" (click)="backToSetup()">
+                Cambiar dirección
+              </button>
+              <a appButton variant="ghost" [routerLink]="['/sets', setId()]">Volver al conjunto</a>
+            </app-session-summary>
+          }
+        }
+      }
+    }
+  }
+}

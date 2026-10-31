@@ -1,0 +1,235 @@
+<div class="review-layout" [class.is-studying]="phase() !== 'setup'">
+  <div class="review-main">
+    <header class="page-header">
+      <p class="eyebrow">Refuerza tu aprendizaje</p>
+      <h1>Rep<span>asar</span></h1>
+      <p class="description">
+        Te muestra cada palabra cuando conviene: primero lo que más te cuesta, sin frenar las
+        nuevas.
+      </p>
+    </header>
+
+    @switch (status()) {
+      @case ('loading') {
+        <div class="stats" aria-busy="true" aria-label="Cargando repasos">
+          @for (item of [1, 2, 3, 4]; track item) {
+            <app-skeleton height="8rem" radius="var(--radius-xl)" />
+          }
+        </div>
+      }
+      @case ('error') {
+        <app-empty-state
+          tone="danger"
+          icon="alert"
+          title="No pudimos cargar tus repasos"
+          [description]="error()"
+        >
+          <button appButton variant="secondary" type="button" (click)="reload()">Reintentar</button>
+        </app-empty-state>
+      }
+      @case ('ready') {
+        @if (totalItems() === 0) {
+          <app-empty-state
+            icon="repeat"
+            title="Aún no hay palabras para repasar"
+            description="Crea un conjunto y agrégale vocabulario: las palabras nuevas aparecerán aquí."
+          >
+            <a appButton routerLink="/sets">Ir a mis conjuntos</a>
+          </app-empty-state>
+        } @else {
+          @switch (phase()) {
+            @case ('setup') {
+              @if (overview(); as o) {
+                <div class="stats">
+                  <app-stat-tile
+                    label="Pendientes"
+                    layout="row"
+                    icon="clock"
+                    tone="warning"
+                    [value]="o.dueNow"
+                    caption="Toca repasarlas ya"
+                  >
+                    <button
+                      class="stat-action"
+                      type="button"
+                      aria-label="Ver repaso inteligente"
+                      (click)="selectMode('smart')"
+                    >
+                      <app-icon name="chevron-right" />
+                    </button>
+                  </app-stat-tile>
+                  <app-stat-tile
+                    label="Difíciles"
+                    layout="row"
+                    icon="alert"
+                    tone="danger"
+                    [value]="o.counts.difficult"
+                    caption="Las que más te cuestan"
+                  >
+                    <button
+                      class="stat-action"
+                      type="button"
+                      aria-label="Repasar mis dificultades"
+                      (click)="selectMode('difficult')"
+                    >
+                      <app-icon name="chevron-right" />
+                    </button>
+                  </app-stat-tile>
+                  <app-stat-tile
+                    label="Dominadas"
+                    layout="row"
+                    icon="star"
+                    tone="success"
+                    [value]="masteredCount()"
+                    [caption]="
+                      o.counts.learned + ' aprendidas · ' + o.counts.provisional + ' por comprobar'
+                    "
+                  >
+                    <a
+                      class="stat-action"
+                      routerLink="/progress"
+                      aria-label="Ver el progreso de mis palabras dominadas"
+                    >
+                      <app-icon name="chevron-right" />
+                    </a>
+                  </app-stat-tile>
+                  <app-stat-tile
+                    label="Próximo repaso"
+                    layout="row"
+                    icon="calendar"
+                    tone="info"
+                    [value]="nextDueLabel() ?? '—'"
+                    [caption]="o.dueTomorrow + ' para mañana'"
+                  >
+                    <button
+                      class="stat-action"
+                      type="button"
+                      aria-label="Ver el próximo repaso"
+                      (click)="selectMode('smart')"
+                    >
+                      <app-icon name="chevron-right" />
+                    </button>
+                  </app-stat-tile>
+                </div>
+              }
+
+              <div class="setup">
+                <app-segmented-control
+                  class="mode-control"
+                  appearance="cards"
+                  legend="Modo de repaso"
+                  [options]="modeOptions()"
+                  [value]="selectedMode()"
+                  (valueChange)="selectMode($event)"
+                />
+
+                @if (queueLoading()) {
+                  <app-skeleton height="14rem" radius="var(--radius-xl)" />
+                } @else if (queue().length === 0) {
+                  @switch (selectedMode()) {
+                    @case ('smart') {
+                      <app-empty-state
+                        tone="success"
+                        icon="check"
+                        title="¡Estás al día!"
+                        [description]="
+                          'No tienes palabras pendientes ni nuevas. Próximo repaso: ' +
+                          (nextDueLabel() ?? 'sin programar').toLocaleLowerCase('es') +
+                          '.'
+                        "
+                      >
+                        @if ((overview()?.counts?.difficult ?? 0) > 0) {
+                          <button appButton type="button" (click)="selectMode('difficult')">
+                            Practicar mis dificultades
+                          </button>
+                        }
+                        <a appButton variant="secondary" routerLink="/progress">Ver mi progreso</a>
+                      </app-empty-state>
+                    }
+                    @case ('difficult') {
+                      <app-empty-state
+                        tone="success"
+                        icon="check"
+                        title="No tienes palabras difíciles"
+                        description="Cuando falles una palabra varias veces aparecerá aquí para que la practiques."
+                      >
+                        <button
+                          appButton
+                          variant="secondary"
+                          type="button"
+                          (click)="selectMode('smart')"
+                        >
+                          Ir al repaso inteligente
+                        </button>
+                      </app-empty-state>
+                    }
+                    @case ('learned') {
+                      <app-empty-state
+                        icon="book"
+                        title="Aún no tienes palabras aprendidas"
+                        description="Una palabra queda aprendida cuando la dominas y después la recuerdas en días distintos."
+                      >
+                        <button
+                          appButton
+                          variant="secondary"
+                          type="button"
+                          (click)="selectMode('smart')"
+                        >
+                          Ir al repaso inteligente
+                        </button>
+                      </app-empty-state>
+                    }
+                  }
+                } @else {
+                  <app-study-setup
+                    ordered
+                    appearance="plain"
+                    [cardCount]="queue().length"
+                    [(direction)]="direction"
+                    (start)="start()"
+                  >
+                    <p class="inline-note mode-note">
+                      <app-icon name="info" [size]="18" />
+                      <span>{{ modeNote() }}</span>
+                    </p>
+                  </app-study-setup>
+                }
+              </div>
+            }
+            @case ('session') {
+              <app-flashcard-session
+                showSetName
+                [cards]="cards()"
+                [direction]="direction()"
+                (answered)="onAnswered($event)"
+                (finished)="onFinished($event)"
+              />
+            }
+            @case ('summary') {
+              @if (summary(); as result) {
+                <app-session-summary [summary]="result" title="¡Repaso completado!">
+                  @if (gains.message(); as message) {
+                    <p summaryNote class="inline-note" data-tone="success" role="status">
+                      <app-icon name="star" [size]="18" /> <span>{{ message }}</span>
+                    </p>
+                  }
+                  <button appButton type="button" (click)="reload()">
+                    {{
+                      selectedMode() === 'difficult'
+                        ? 'Practicarlas otra vez'
+                        : 'Buscar más repasos'
+                    }}
+                  </button>
+                  <a appButton variant="secondary" routerLink="/progress">Ver mi progreso</a>
+                </app-session-summary>
+              }
+            }
+          }
+        }
+      }
+    }
+  </div>
+  @if (phase() === 'setup') {
+    <app-review-companion />
+  }
+</div>

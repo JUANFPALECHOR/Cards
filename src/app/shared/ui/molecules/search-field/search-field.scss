@@ -1,0 +1,23 @@
+:host {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  inset-inline-start: var(--space-3);
+  color: var(--color-text-subtle);
+  pointer-events: none;
+}
+
+input {
+  font-size: var(--search-font-size, var(--font-size-md));
+  padding-inline: calc(var(--space-3) + 18px + var(--space-2))
+    calc(var(--control-height-sm) + var(--space-2));
+}
+
+.clear {
+  position: absolute;
+  inset-inline-end: var(--space-1);
+}

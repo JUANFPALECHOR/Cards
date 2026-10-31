@@ -1,0 +1,82 @@
+@use 'mixins' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.counter {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+
+  strong {
+    color: var(--color-text);
+  }
+}
+
+.stage {
+  margin-top: var(--space-2);
+}
+
+.controls {
+  min-height: var(--control-height-lg);
+}
+
+.answers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+
+  @include up(sm) {
+    gap: var(--space-3);
+  }
+}
+
+.shortcuts {
+  display: none;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-subtle);
+  text-align: center;
+
+  // Solo donde hay teclado físico probable.
+  @media (hover: hover) and (pointer: fine) {
+    display: block;
+  }
+}
+
+kbd {
+  padding: 0.1em 0.45em;
+  font-family: inherit;
+  font-size: 0.95em;
+  background: var(--color-surface-sunken);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+// Tres botones lado a lado. En móvil el icono va sobre el texto para que todo quepa sin cortarse.
+.answers button {
+  padding-inline: var(--space-2);
+
+  @include down(sm) {
+    flex-direction: column;
+    gap: var(--space-1);
+    min-height: 4.25rem;
+    font-size: var(--font-size-sm);
+  }
+}
+
+.hard app-icon {
+  color: var(--color-warning);
+}

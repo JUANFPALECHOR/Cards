@@ -1,0 +1,14 @@
+// Poppins alojada localmente (public/fonts, licencia OFL). Subconjunto latino: incluye á é í ó ú ü ñ ¿ ¡.
+// Las rutas absolutas (/fonts/...) las sirve tal cual el builder de Angular.
+
+$poppins-weights: 400, 500, 600, 700;
+
+@each $weight in $poppins-weights {
+  @font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: $weight;
+    font-display: swap;
+    src: url('/fonts/poppins-latin-#{$weight}-normal.woff2') format('woff2');
+  }
+}

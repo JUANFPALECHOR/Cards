@@ -1,0 +1,121 @@
+// Tokens de color semánticos. Los componentes solo usan estos nombres, nunca valores directos.
+// Contraste verificado (WCAG): texto ≥ 4.5:1 sobre bg/surface; bordes de campos ≥ 3:1.
+// `--color-accent` (coral) es decorativo: solo rellenos e iconos, nunca texto pequeño.
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg: #f6f6fb;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f0f1f7;
+  --color-border: #e2e3ec;
+  --color-border-strong: #c9cbd8;
+  --color-border-input: #8b8da6;
+
+  --color-text: #1a1b2e;
+  --color-text-muted: #545670;
+  --color-text-subtle: #6c6e86;
+
+  --color-primary: #4f46e0;
+  --color-primary-hover: #4038c4;
+  --color-on-primary: #ffffff;
+  --color-primary-soft: #e4e3ff;
+  --color-on-primary-soft: #3d34b8;
+
+  --color-accent: #f2643d;
+  --color-accent-soft: #fff0eb;
+  --color-on-accent-soft: #b13d1c;
+
+  --color-success: #15803d;
+  --color-success-soft: #e8f6ed;
+  --color-on-success-soft: #166534;
+
+  --color-danger: #d42a20;
+  --color-danger-hover: #b42318;
+  --color-on-danger: #ffffff;
+  --color-danger-soft: #fdeceb;
+  --color-on-danger-soft: #b42318;
+
+  --color-warning: #b45309;
+  --color-warning-soft: #fef4e4;
+  --color-on-warning-soft: #92400e;
+
+  --color-info: #0369a1;
+  --color-info-soft: #e7f3fa;
+  --color-on-info-soft: #075985;
+
+  // Estados del vocabulario (barra segmentada). Validados para daltonismo entre segmentos contiguos
+  // (aprendida · dominada · en aprendizaje · difícil · nueva); siempre acompañados de leyenda con texto.
+  --color-status-new: #a3a6ba;
+  --color-status-learning: #ca8a04;
+  --color-status-difficult: #dc2626;
+  --color-status-provisional: #2563eb;
+  --color-status-learned: #16a34a;
+
+  --color-focus-ring: #4f46e0;
+  --color-overlay: rgb(16 17 32 / 0.45);
+  --color-topbar: rgb(246 246 251 / 0.85);
+
+  --shadow-sm: 0 1px 2px rgb(26 27 46 / 0.06), 0 1px 1px rgb(26 27 46 / 0.04);
+  --shadow-md: 0 4px 12px -2px rgb(26 27 46 / 0.08), 0 2px 4px -2px rgb(26 27 46 / 0.05);
+  --shadow-lg: 0 16px 40px -8px rgb(26 27 46 / 0.18), 0 4px 12px -4px rgb(26 27 46 / 0.08);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: #101120;
+  --color-surface: #181a2b;
+  --color-surface-sunken: #141524;
+  --color-border: #2b2d44;
+  --color-border-strong: #3d405c;
+  --color-border-input: #636685;
+
+  --color-text: #ecedf6;
+  --color-text-muted: #a7a9c2;
+  --color-text-subtle: #8d90ab;
+
+  --color-primary: #8a87ff;
+  --color-primary-hover: #a19eff;
+  --color-on-primary: #12122a;
+  --color-primary-soft: #25244a;
+  --color-on-primary-soft: #c4c2ff;
+
+  --color-accent: #ff8a66;
+  --color-accent-soft: #3a2420;
+  --color-on-accent-soft: #ffb59e;
+
+  --color-success: #4ade80;
+  --color-success-soft: #15301f;
+  --color-on-success-soft: #86efac;
+
+  --color-danger: #f87171;
+  --color-danger-hover: #fca5a5;
+  --color-on-danger: #1f0a0c;
+  --color-danger-soft: #3a1b1e;
+  --color-on-danger-soft: #fca5a5;
+
+  --color-warning: #fbbf24;
+  --color-warning-soft: #352812;
+  --color-on-warning-soft: #fcd34d;
+
+  --color-info: #38bdf8;
+  --color-info-soft: #112c3d;
+  --color-on-info-soft: #7dd3fc;
+
+  --color-status-new: #555874;
+  --color-status-learning: #e8b923;
+  --color-status-difficult: #f06a6a;
+  --color-status-provisional: #4a8ef0;
+  --color-status-learned: #2fb862;
+
+  --color-focus-ring: #a19eff;
+  --color-overlay: rgb(5 5 12 / 0.65);
+  --color-topbar: rgb(16 17 32 / 0.85);
+
+  // En oscuro la sombra apenas se ve: el borde de la superficie hace el trabajo de separación.
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 16px 40px -8px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.04);
+}

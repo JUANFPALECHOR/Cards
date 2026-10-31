@@ -1,0 +1,36 @@
+@use 'mixins' as *;
+
+// Cambio de icono: indica el estado. Poco frecuente → animación estándar y breve.
+// Ambos iconos están apilados; el inactivo sale con escala + rotación leves y desenfoque
+// para que el cruce se lea como una sola transformación.
+
+.icons {
+  display: grid;
+}
+
+.icon {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out),
+    filter var(--duration-base) var(--ease-out);
+}
+
+[data-theme-current='light'] .icon-moon,
+[data-theme-current='dark'] .icon-sun {
+  opacity: 0;
+  transform: scale(0.6) rotate(-45deg);
+  filter: blur(2px);
+}
+
+@include reduced-motion {
+  .icon {
+    transition: opacity var(--duration-base) ease;
+  }
+
+  [data-theme-current='light'] .icon-moon,
+  [data-theme-current='dark'] .icon-sun {
+    transform: none;
+    filter: none;
+  }
+}

@@ -1,0 +1,122 @@
+@use 'mixins' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+// La portada de conjuntos comparte la alineación de su cabecera con la navegación.
+:host:has(app-study-sets-page) {
+  --container-max: 93rem;
+  --topbar-height: 4.125rem;
+  --nav-radius: 0.875rem;
+  --color-bg: #f8f9ff;
+  --color-primary: #5035f5;
+  --color-primary-hover: #4530da;
+  --color-on-primary-soft: #4c34e5;
+  --color-text-muted: #62647e;
+  --color-border-strong: #d9dbed;
+  background: var(--color-bg);
+
+  main {
+    padding-top: 2.75rem;
+  }
+
+  @include down(md) {
+    main {
+      padding-top: 2rem;
+    }
+  }
+}
+
+:host-context([data-theme='dark']):has(app-study-sets-page) {
+  --color-bg: #101120;
+  --color-primary: #a19aff;
+  --color-primary-hover: #b4afff;
+  --color-on-primary-soft: #c4c2ff;
+  --color-text-muted: #a7a9c2;
+  --color-border-strong: #3d405c;
+}
+
+// El acento rojo pertenece a Repasar; el resto de rutas conserva su tema.
+:host:has(app-review-page) {
+  --container-max: 84rem;
+  --topbar-height: 4rem;
+  --nav-radius: 0.875rem;
+  --color-bg: #fcfafc;
+  --color-text: #10111b;
+  --color-text-muted: #545974;
+  --color-primary: #c90d1b;
+  --color-primary-hover: #ae0a16;
+  --color-primary-soft: #fcebed;
+  --color-on-primary-soft: #ac0a16;
+  --color-accent: #e83842;
+  --color-focus-ring: #c90d1b;
+  --color-topbar: rgb(252 250 252 / 0.92);
+  color: var(--color-text);
+  background: var(--color-bg);
+
+  main {
+    padding-top: 2.25rem;
+  }
+
+  @include down(md) {
+    main {
+      padding-top: 1.5rem;
+    }
+  }
+}
+
+:host-context([data-theme='dark']):has(app-review-page) {
+  --color-bg: #17131c;
+  --color-surface: #221c28;
+  --color-surface-sunken: #1c1721;
+  --color-text: #f5edf2;
+  --color-text-muted: #b9afc3;
+  --color-border: #3b3042;
+  --color-border-strong: #5a4b63;
+  --color-primary: #ff858e;
+  --color-primary-hover: #ffa3aa;
+  --color-on-primary: #30080e;
+  --color-primary-soft: #3b202b;
+  --color-on-primary-soft: #ffa3aa;
+  --color-accent: #d64153;
+  --color-focus-ring: #ff858e;
+  --color-topbar: rgb(23 19 28 / 0.92);
+}
+
+main {
+  flex: 1;
+  padding-top: var(--space-6);
+  // Deja espacio para la navegación inferior fija en móvil.
+  padding-bottom: calc(
+    var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + var(--space-10)
+  );
+
+  &:focus {
+    outline: none;
+  }
+
+  @include up(md) {
+    padding-top: var(--space-10);
+    padding-bottom: var(--space-16);
+  }
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: calc(var(--z-toast) + 1);
+  padding: var(--space-2) var(--space-4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border-radius: var(--radius-md);
+  transform: translateY(-200%);
+
+  &:focus-visible {
+    transform: none;
+  }
+}

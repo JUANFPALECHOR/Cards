@@ -1,0 +1,81 @@
+// Tokens independientes del tema: tipografía, espaciado, radios, movimiento y layout.
+// Los colores viven en _themes.scss.
+
+:root {
+  // Tipografía
+  --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --font-size-xs: 0.75rem; // 12px — etiquetas pequeñas, contadores
+  --font-size-sm: 0.875rem; // 14px — texto secundario, botones pequeños
+  --font-size-md: 1rem; // 16px — lectura, botones, campos
+  --font-size-lg: 1.125rem; // 18px — texto destacado
+  --font-size-xl: 1.25rem; // 20px — títulos de tarjeta
+  --font-size-2xl: 1.5rem; // 24px — títulos de sección
+  --font-size-3xl: clamp(1.75rem, 1.45rem + 1.25vw, 2.25rem); // 28→36px — título de página
+  --font-size-card: clamp(1.75rem, 1.25rem + 2.25vw, 2.75rem); // 28→44px — contenido de flashcards
+
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.35;
+  --line-height-normal: 1.6;
+
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-snug: -0.01em;
+  --letter-spacing-wide: 0.04em;
+
+  // Espaciado (base 4px)
+  --space-0-5: 0.125rem;
+  --space-1: 0.25rem;
+  --space-1-5: 0.375rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  // Radios
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.25rem;
+  --radius-full: 999px;
+
+  // Movimiento (valores de la skill emil-design-eng / animate)
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --duration-press: 140ms; // feedback al pulsar
+  --duration-fast: 160ms; // cambios de color / hover
+  --duration-base: 200ms; // diálogos, iconos
+  --duration-exit: 150ms; // las salidas son más rápidas que las entradas
+
+  // Layout
+  --container-max: 72rem;
+  --container-padding: var(--space-4);
+  --topbar-height: 3.5rem;
+  --bottom-nav-height: 4rem;
+  --control-height-sm: 2.25rem;
+  --control-height-md: 2.75rem; // ≥ 44px: objetivo táctil cómodo
+  --control-height-lg: 3.25rem;
+
+  // Capas
+  --z-sticky: 100;
+  --z-toast: 300;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --container-padding: var(--space-8);
+    --topbar-height: 4rem;
+    --bottom-nav-height: 0px;
+  }
+}

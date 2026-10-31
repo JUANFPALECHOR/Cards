@@ -1,0 +1,234 @@
+@use 'mixins' as *;
+
+:host {
+  display: block;
+  isolation: isolate;
+}
+
+.collection {
+  // Reserva el lateral para la ilustración sin cubrir las acciones de las tarjetas.
+  width: calc(100% - clamp(15rem, 23vw, 25rem));
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  min-height: 12.25rem;
+  margin-bottom: 2rem;
+}
+.hero-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 38rem;
+}
+.eyebrow {
+  margin-bottom: 1rem;
+  color: var(--color-on-primary-soft);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+h1 {
+  margin-bottom: 0.625rem;
+  font-size: clamp(2.25rem, 4vw, 3.75rem);
+  letter-spacing: -0.045em;
+  span {
+    color: var(--color-primary);
+  }
+}
+.intro {
+  font-size: 1.3125rem;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+.create-button {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  min-width: 15.75rem;
+  min-height: 4.125rem;
+  margin-bottom: 0.75rem;
+  padding-inline: 1.75rem;
+  font-size: 1.125rem;
+  border-radius: 0.875rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  box-shadow: 0 8px 24px -12px var(--color-primary);
+}
+.hero-art {
+  position: absolute;
+  width: 26rem;
+  height: 15rem;
+  right: 15rem;
+  top: -0.25rem;
+  pointer-events: none;
+}
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 37rem) 10.75rem 13.5rem;
+  gap: 0.875rem;
+  margin-bottom: 2.375rem;
+}
+.search {
+  --control-height-md: 3.5rem;
+  --search-font-size: 1.0625rem;
+  --color-border-input: var(--color-border);
+  --radius-md: 0.875rem;
+  min-width: 0;
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 6px 20px -10px color-mix(in srgb, var(--color-primary) 20%, transparent),
+    var(--shadow-sm);
+}
+.filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  select {
+    appearance: none;
+    width: 100%;
+    min-height: 3.5rem;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-size: 1.0625rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+  }
+  app-icon {
+    position: absolute;
+    color: var(--color-text-muted);
+    pointer-events: none;
+  }
+}
+.chevron {
+  right: 1rem;
+}
+.sort-icon {
+  left: 1rem;
+}
+.sort select {
+  padding-left: 3rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 28rem), 1fr));
+  gap: 1.75rem;
+  padding: 0;
+  list-style: none;
+
+  li {
+    min-width: 0;
+    max-width: 31.75rem;
+  }
+}
+
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 26rem;
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1.75rem;
+}
+
+.notice {
+  margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-on-warning-soft);
+  background: var(--color-warning-soft);
+  border-radius: var(--radius-md);
+}
+
+@media (min-width: 40rem) and (max-width: 63.99rem) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  }
+}
+@media (max-width: 79.99rem) {
+  .hero-copy {
+    max-width: 35rem;
+  }
+  .hero-art {
+    display: none;
+  }
+  .toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .search {
+    grid-column: 1 / -1;
+  }
+}
+@include down(lg) {
+  .collection {
+    width: 100%;
+  }
+  .hero {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .hero-copy {
+    max-width: 36rem;
+  }
+  .hero-art {
+    display: none;
+  }
+  .toolbar {
+    grid-template-columns: minmax(0, 1fr) 10rem 12rem;
+  }
+  .search {
+    grid-column: auto;
+    --search-font-size: 1rem;
+  }
+  .filter select {
+    font-size: 1rem;
+  }
+}
+@include down(md) {
+  .hero {
+    margin-bottom: 2rem;
+  }
+  .hero-copy {
+    max-width: 100%;
+  }
+  .hero-art {
+    display: none;
+  }
+  .intro {
+    font-size: 1rem;
+  }
+  .create-button {
+    min-height: 3.25rem;
+    font-size: 1rem;
+  }
+  .toolbar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 0.625rem;
+  }
+  .search {
+    grid-column: 1 / -1;
+  }
+  .filter select {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 28rem) {
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+  .create-button {
+    width: 100%;
+  }
+}

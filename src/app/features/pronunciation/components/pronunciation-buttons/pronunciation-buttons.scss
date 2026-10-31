@@ -1,0 +1,68 @@
+@use 'mixins' as *;
+
+// Control compacto en forma de píldora: dos botones que no compiten con el contenido.
+// Se pulsa muchas veces por sesión → solo color y una presión mínima, sin otros movimientos.
+:host {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 1.75rem;
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  touch-action: manipulation;
+  @include control-text;
+  transition:
+    transform var(--duration-press) var(--ease-out),
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+
+  // Área táctil cómoda aunque el control se vea pequeño.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -8px 0;
+  }
+
+  @include hover {
+    color: var(--color-text);
+    background: var(--color-surface-sunken);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &.is-active {
+    color: var(--color-on-primary-soft);
+    background: var(--color-primary-soft);
+  }
+}
+
+.rate {
+  line-height: 1;
+}
+
+@include reduced-motion {
+  .btn:active {
+    transform: none;
+  }
+}

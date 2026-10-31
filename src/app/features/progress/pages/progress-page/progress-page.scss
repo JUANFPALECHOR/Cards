@@ -1,0 +1,274 @@
+@use 'mixins' as *;
+
+%card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.overview {
+  @extend %card;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-bottom: var(--space-5);
+  padding: var(--space-6);
+
+  @include down(sm) {
+    padding: var(--space-5);
+  }
+}
+
+.overview-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.figure-value {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.figure-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  font-weight: var(--font-weight-semibold);
+}
+
+.figure-caption {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.dot {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+  border-radius: 3px;
+}
+
+.mastery-bar {
+  --bar-height: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+
+  @include up(lg) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+.skeleton-grid {
+  margin-top: var(--space-5);
+}
+
+.tile-action {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+}
+
+.columns {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.panel {
+  @extend %card;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-5);
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-lg);
+
+  app-icon {
+    color: var(--color-text-subtle);
+  }
+}
+
+.panel-subtitle {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.panel-empty {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+// --- Necesitan atención ---------------------------------------------------------------------
+
+.word-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.word {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+
+  & + & {
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+.word-main {
+  min-width: 0;
+
+  p:first-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--space-2);
+  }
+}
+
+.word-translation {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.word-reason {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-on-danger-soft);
+}
+
+.word-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// --- Logros ---------------------------------------------------------------------------------
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-info-soft);
+  background: var(--color-info-soft);
+  border-radius: var(--radius-full);
+
+  &.is-learned {
+    color: var(--color-on-success-soft);
+    background: var(--color-success-soft);
+  }
+}
+
+// --- Próximos repasos -----------------------------------------------------------------------
+
+.upcoming {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+
+  div {
+    padding: var(--space-3);
+    background: var(--color-surface-sunken);
+    border-radius: var(--radius-md);
+  }
+
+  dt {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// --- Historial ------------------------------------------------------------------------------
+
+.history {
+  margin-top: var(--space-4);
+}
+
+// --- Criterios ------------------------------------------------------------------------------
+
+.criteria {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-10);
+
+  dl {
+    display: grid;
+    gap: var(--space-4);
+
+    @include up(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  dt {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  dd {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+}

@@ -1,0 +1,87 @@
+<section class="auth">
+  @if (pendingConfirmation(); as address) {
+    <h1 class="sr-only">Revisa tu correo</h1>
+    <app-empty-state
+      icon="mail"
+      tone="success"
+      title="Revisa tu correo"
+      [description]="
+        'Enviamos un enlace de confirmación a ' + address + '. Ábrelo y después inicia sesión.'
+      "
+    >
+      <a appButton routerLink="/login">Ir a iniciar sesión</a>
+    </app-empty-state>
+  } @else {
+    <header class="header">
+      <h1>{{ isRegister() ? 'Crea tu cuenta' : 'Inicia sesión' }}</h1>
+      <p class="lead">
+        {{
+          isRegister()
+            ? 'Guarda tus conjuntos y tu progreso para estudiar desde cualquier dispositivo.'
+            : 'Entra para continuar con tus conjuntos y tu repaso.'
+        }}
+      </p>
+    </header>
+
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <app-form-field label="Correo electrónico" [error]="emailError()" required>
+        <input
+          appInput
+          formControlName="email"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          autocapitalize="none"
+          spellcheck="false"
+          enterkeyhint="next"
+          placeholder="nombre@correo.com"
+        />
+      </app-form-field>
+
+      <app-form-field
+        label="Contraseña"
+        [hint]="isRegister() ? 'Al menos ' + passwordMin + ' caracteres.' : null"
+        [error]="passwordError()"
+        required
+      >
+        <input
+          appInput
+          formControlName="password"
+          type="password"
+          [attr.autocomplete]="isRegister() ? 'new-password' : 'current-password'"
+          [attr.enterkeyhint]="isRegister() ? 'next' : 'go'"
+        />
+      </app-form-field>
+
+      @if (isRegister()) {
+        <app-form-field label="Repite la contraseña" [error]="confirmError()" required>
+          <input
+            appInput
+            formControlName="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            enterkeyhint="go"
+          />
+        </app-form-field>
+      }
+
+      @if (serverError(); as message) {
+        <p class="form-error" role="alert">{{ message }}</p>
+      }
+
+      <button appButton type="submit" block [loading]="submitting()" [disabled]="submitting()">
+        {{ isRegister() ? 'Crear cuenta' : 'Iniciar sesión' }}
+      </button>
+    </form>
+
+    <p class="switch">
+      @if (isRegister()) {
+        ¿Ya tienes cuenta?
+        <a routerLink="/login" [queryParams]="{ returnUrl: returnUrl() }">Inicia sesión</a>
+      } @else {
+        ¿Todavía no tienes cuenta?
+        <a routerLink="/registro" [queryParams]="{ returnUrl: returnUrl() }">Crea una</a>
+      }
+    </p>
+  }
+</section>

@@ -1,0 +1,115 @@
+:host {
+  --stat-bg: var(--color-primary-soft);
+  --stat-fg: var(--color-on-primary-soft);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+:host([data-tone='accent']) {
+  --stat-bg: var(--color-accent-soft);
+  --stat-fg: var(--color-on-accent-soft);
+}
+
+:host([data-tone='success']) {
+  --stat-bg: var(--color-success-soft);
+  --stat-fg: var(--color-on-success-soft);
+}
+
+:host([data-tone='warning']) {
+  --stat-bg: var(--color-warning-soft);
+  --stat-fg: var(--color-on-warning-soft);
+}
+
+:host([data-tone='danger']) {
+  --stat-bg: var(--color-danger-soft);
+  --stat-fg: var(--color-on-danger-soft);
+}
+
+:host([data-tone='info']) {
+  --stat-bg: var(--color-info-soft);
+  --stat-fg: var(--color-on-info-soft);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  color: var(--stat-fg);
+  background: var(--stat-bg);
+  border-radius: var(--radius-md);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+  color: var(--color-text-muted);
+}
+
+.value {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+.caption {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+:host([data-layout='row']) {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  align-content: center;
+  column-gap: 1.125rem;
+  row-gap: 0.125rem;
+  min-height: 7.5rem;
+  padding: 1rem 3.25rem 1rem 1rem;
+  border-radius: 1.5rem;
+
+  .top {
+    display: contents;
+  }
+
+  .icon {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    align-self: start;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1rem;
+  }
+
+  .label,
+  .value,
+  .caption {
+    grid-column: 2;
+  }
+  .label {
+    font-weight: var(--font-weight-semibold);
+  }
+  .value {
+    font-size: clamp(1.625rem, 2.4vw, 2.25rem);
+  }
+  .caption {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+}

@@ -1,0 +1,60 @@
+// Átomo: campos de formulario nativos (input, textarea, select) mediante la directiva appInput.
+// Los elementos vacíos (<input>) no pueden alojar la vista de un componente, por eso el estilo es global.
+
+@use 'mixins' as *;
+
+.input {
+  display: block;
+  width: 100%;
+  min-height: var(--control-height-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-md); // 16px mínimo: evita el zoom automático de iOS al enfocar
+  line-height: var(--line-height-snug);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+
+  &::placeholder {
+    color: var(--color-text-subtle);
+    opacity: 1;
+  }
+
+  @include hover {
+    border-color: var(--color-text-muted);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: var(--color-danger);
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 25%, transparent);
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--color-text-subtle);
+    background: var(--color-surface-sunken);
+    border-color: var(--color-border-strong);
+  }
+}
+
+textarea.input {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+// El input de búsqueda nativo añade su propio botón de limpiar; usamos el nuestro.
+.input[type='search']::-webkit-search-cancel-button {
+  display: none;
+}

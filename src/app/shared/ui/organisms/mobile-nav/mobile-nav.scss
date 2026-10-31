@@ -1,0 +1,78 @@
+@use 'mixins' as *;
+
+:host {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: var(--z-sticky);
+  display: block;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--color-topbar);
+  border-top: 1px solid var(--color-border);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+
+  @include up(md) {
+    display: none;
+  }
+}
+
+ul {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  height: var(--bottom-nav-height);
+  padding: 0 max(var(--space-2), env(safe-area-inset-left, 0px));
+  list-style: none;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-0-5);
+  height: 100%;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  @include control-text;
+
+  &:focus-visible {
+    outline-offset: -4px;
+    border-radius: var(--radius-md);
+  }
+}
+
+.tab-icon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  transition:
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    transform var(--duration-press) var(--ease-out);
+}
+
+.tab:active .tab-icon {
+  transform: scale(0.94);
+}
+
+.is-active {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+
+  .tab-icon {
+    color: var(--color-on-primary-soft);
+    background: var(--color-primary-soft);
+  }
+}
+
+@include reduced-motion {
+  .tab:active .tab-icon {
+    transform: none;
+  }
+}
