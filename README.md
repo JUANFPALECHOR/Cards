@@ -244,8 +244,9 @@ Despliegue: `supabase functions deploy pronounce` (con `verify_jwt` activo).
 ## Pendientes para el despliegue en Vercel
 
 - [ ] Usar Node 24 LTS en Vercel (Project Settings → Node.js Version).
-- [ ] Comando de build `npm run build`; carpeta de salida `dist/english-learning/browser`.
-- [ ] Fallback SPA para rutas profundas (`vercel.json` con un rewrite de `/(.*)` a `/index.html`).
+- [x] Comando de build `npm run build` y salida `dist/english-learning/browser`, definidos en `vercel.json`.
+- [x] Fallback SPA para rutas sin extensión; las peticiones a archivos `.js`, `.css`, fuentes e imágenes
+      no se convierten en `index.html` cuando falta el recurso.
 - [ ] Decidir si la URL/clave publicable se inyectan por variables de entorno en tiempo de build
       (hoy están en `environment.ts`; son públicas por diseño).
 - [ ] Activar CAPTCHA (Turnstile/hCaptcha) para el registro y el inicio de sesión, y revisar los límites de Auth.
@@ -256,3 +257,15 @@ Despliegue: `supabase functions deploy pronounce` (con `verify_jwt` activo).
 - [ ] Revisar `get_advisors` de Supabase (seguridad y rendimiento) antes de publicar.
 - [ ] Verificar navegación directa y recarga en `/sets/:id`, `/review` y `/progress`.
 - [ ] Probar en dispositivos reales (iOS Safari y Android Chrome): giro de tarjetas, teclado virtual, áreas seguras.
+
+### Si aparece «Failed to load module script» con MIME `text/html`
+
+Significa que una URL de JavaScript respondió con HTML. La configuración anterior devolvía
+`index.html` incluso para archivos inexistentes y permitía conservar las respuestas `.js` un año.
+La configuración actual limita el fallback a rutas sin extensión y exige revalidar HTML, JavaScript
+y CSS. Consulta las reglas de [rewrites de Vercel](https://vercel.com/docs/project-configuration/vercel-json#rewrites).
+
+Después de publicar este cambio, haz una recarga completa (`Ctrl + Shift + R`). Si persiste,
+abre DevTools → Network, activa **Disable cache** y recarga. No es necesario borrar la sesión
+ni el almacenamiento de Supabase. Un módulo válido debe responder `200` con un tipo MIME
+JavaScript; un archivo inexistente debe responder `404`, sin devolver el HTML de la aplicación.
