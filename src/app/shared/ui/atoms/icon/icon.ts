@@ -36,7 +36,8 @@ export type IconName =
   | 'more-vertical'
   | 'play'
   | 'wave'
-  | 'star';
+  | 'star'
+  | 'bolt';
 
 /**
  * Iconos SVG inline (trazo de 24px, sin dependencias). Decorativos por defecto:
@@ -217,6 +218,9 @@ export type IconName =
         }
         @case ('star') {
           <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z" />
+        }
+        @case ('bolt') {
+          <path d="M13 2.5 4.5 13.5h7l-1 8 8.5-11h-7z" />
         }
       }
     </svg>

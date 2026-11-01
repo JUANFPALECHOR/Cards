@@ -67,6 +67,23 @@ export interface QueueEntry {
   readonly state: LearningState | null;
 }
 
+/** Palabra del usuario con su estado de aprendizaje (null = nueva). */
+export interface WordEntry {
+  readonly itemId: string;
+  readonly setName: string;
+  readonly term: string;
+  readonly translation: string;
+  readonly state: LearningState | null;
+}
+
+type WordRow = {
+  id: string;
+  term: string;
+  translation: string;
+  study_sets: { name: string } | { name: string }[] | null;
+  review_states: StateRow | StateRow[] | null;
+};
+
 /** Persistencia del aprendizaje: intentos, estado por palabra y colas de Repasar. */
 @Injectable({ providedIn: 'root' })
 export class LearningRepository {
@@ -127,6 +144,27 @@ export class LearningRepository {
       masteredToday: row.mastered_today,
       learnedToday: row.learned_today,
     };
+  }
+
+  /** Todo el vocabulario del usuario con su estado (avance por palabra, listas y juego). */
+  async getWords(): Promise<WordEntry[]> {
+    await this.session.ensure();
+    const rows = unwrap(
+      await this.supabase
+        .from('vocabulary_items')
+        .select('id, term, translation, study_sets(name), review_states(*)')
+        .order('created_at', { ascending: true }),
+    );
+    return ((rows ?? []) as unknown as WordRow[]).map((row) => {
+      const state = one(row.review_states);
+      return {
+        itemId: row.id,
+        setName: one(row.study_sets)?.name ?? '',
+        term: row.term,
+        translation: row.translation,
+        state: state ? stateFromRow(state) : null,
+      };
+    });
   }
 
   /** Candidatos del modo indicado (el orden final lo decide review-queue.ts). */
@@ -208,4 +246,10 @@ export function stateToRow(state: LearningState): Json {
 
 function toDate(value: string | null): Date | null {
   return value ? new Date(value) : null;
+}
+
+/** PostgREST puede devolver una relación como objeto o como arreglo de uno. */
+export function one<T>(value: T | T[] | null | undefined): T | null {
+  if (!value) return null;
+  return Array.isArray(value) ? (value[0] ?? null) : value;
 }

@@ -21,7 +21,6 @@ import {
   SegmentOption,
   SegmentedControl,
 } from '../../../../shared/ui/molecules/segmented-control/segmented-control';
-import { StatTile } from '../../../../shared/ui/molecules/stat-tile/stat-tile';
 import { currentTimeZone, formatDueDay } from '../../../../shared/utils/dates';
 import { pluralize } from '../../../../shared/utils/text';
 import {
@@ -33,7 +32,14 @@ import { StudySetup } from '../../../flashcards/components/study-setup/study-set
 import { SessionSummary as Summary } from '../../../flashcards/domain/study-session';
 import { StudyCard } from '../../../flashcards/models/study-card';
 import { ReviewCompanion } from '../../components/review-companion/review-companion';
-import { LearningOverview, LearningRepository, QueueEntry } from '../../data/learning.repository';
+import { ReviewStats, WordGroup } from '../../components/review-stats/review-stats';
+import { WordGroupSheet } from '../../components/word-group-sheet/word-group-sheet';
+import {
+  LearningOverview,
+  LearningRepository,
+  QueueEntry,
+  WordEntry,
+} from '../../data/learning.repository';
 import {
   MAX_DIFFICULT_CARDS,
   MAX_REVIEW_CARDS,
@@ -71,7 +77,8 @@ const MODES: readonly ReviewMode[] = ['smart', 'difficult', 'learned'];
     EmptyState,
     ReviewCompanion,
     SegmentedControl,
-    StatTile,
+    ReviewStats,
+    WordGroupSheet,
     FlashcardSession,
     SessionSummary,
     StudySetup,
@@ -100,6 +107,11 @@ export class ReviewPage {
   protected readonly cards = signal<readonly StudyCard[]>([]);
   protected readonly summary = signal<Summary | null>(null);
   protected readonly gains = new SessionGains();
+  /** Lista abierta desde una tarjeta (Pendientes, Difíciles, Dominadas). */
+  protected readonly sheet = signal<WordGroup | null>(null);
+  protected readonly sheetWords = signal<readonly WordEntry[] | null>(null);
+  /** Modo que debe empezar en cuanto su cola termine de cargar. */
+  private pendingStart: ReviewMode | null = null;
 
   protected readonly queue = computed(() => {
     const candidates = this.candidates();
@@ -139,10 +151,6 @@ export class ReviewPage {
   protected readonly totalItems = computed(() => {
     const counts = this.overview()?.counts;
     return counts ? Object.values(counts).reduce((sum, value) => sum + value, 0) : 0;
-  });
-  protected readonly masteredCount = computed(() => {
-    const counts = this.overview()?.counts;
-    return counts ? counts.provisional + counts.learned : 0;
   });
   protected readonly nextDueLabel = computed(() => {
     const overview = this.overview();
@@ -204,6 +212,29 @@ export class ReviewPage {
     this.selectedMode.set(mode);
   }
 
+  protected openSheet(group: WordGroup): void {
+    this.sheet.set(group);
+    if (this.sheetWords()) return;
+    this.learning.getWords().then(
+      (words) => this.sheetWords.set(words),
+      (error: unknown) => {
+        this.sheet.set(null);
+        this.toast.error(toAppError(error).message);
+      },
+    );
+  }
+
+  /** Desde la lista: empieza a practicar ese grupo (espera a que cargue su cola si hace falta). */
+  protected practice(mode: ReviewMode): void {
+    this.sheet.set(null);
+    if (this.loadedMode() === mode && this.selectedMode() === mode) {
+      if (this.queue().length > 0) this.start();
+      return;
+    }
+    this.pendingStart = mode;
+    this.selectMode(mode);
+  }
+
   protected start(): void {
     this.cards.set(
       this.queue().map((entry) => ({
@@ -245,6 +276,7 @@ export class ReviewPage {
   }
 
   private async load(): Promise<void> {
+    this.sheetWords.set(null);
     this.status.set('loading');
     this.phase.set('setup');
     this.error.set(null);
@@ -271,9 +303,14 @@ export class ReviewPage {
       candidates.forEach((entry) => this.recorder.remember(entry.itemId, entry.state));
       this.candidates.set(candidates);
       this.loadedMode.set(mode);
+      if (this.pendingStart === mode) {
+        this.pendingStart = null;
+        if (this.queue().length > 0) this.start();
+      }
     } catch (error) {
       if (rethrow) throw error;
       if (request !== this.request) return;
+      this.pendingStart = null;
       this.toast.error(toAppError(error).message);
       this.selectedMode.set(this.loadedMode() ?? 'smart');
     }

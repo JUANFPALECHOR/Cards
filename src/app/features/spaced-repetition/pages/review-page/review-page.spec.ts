@@ -47,6 +47,7 @@ describe('ReviewPage', () => {
   const getOverview = vi.fn();
   const getQueue = vi.fn();
   const record = vi.fn();
+  const getWords = vi.fn();
 
   beforeEach(() => {
     getOverview.mockReset().mockResolvedValue(OVERVIEW);
@@ -64,10 +65,27 @@ describe('ReviewPage', () => {
             : [],
       );
     record.mockReset();
+    getWords.mockReset().mockResolvedValue([
+      {
+        itemId: 'l',
+        setName: 'Redes',
+        term: 'learning-word',
+        translation: 'x',
+        state: state('learning', 1),
+      },
+      {
+        itemId: 'd',
+        setName: 'Redes',
+        term: 'difficult-word',
+        translation: 'y',
+        state: state('difficult', 3),
+      },
+      { itemId: 'n', setName: 'Redes', term: 'new-word', translation: 'z', state: null },
+    ]);
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
-        { provide: LearningRepository, useValue: { getOverview, getQueue } },
+        { provide: LearningRepository, useValue: { getOverview, getQueue, getWords } },
         { provide: LearningRecorder, useValue: { record, remember: vi.fn() } },
       ],
     });
@@ -105,42 +123,31 @@ describe('ReviewPage', () => {
     expect(element.textContent).toContain('Solo las palabras que más te cuestan');
   });
 
-  it('los accesos de los contadores cambian al modo correspondiente con su cola real', async () => {
+  it('las tarjetas abren la lista de sus palabras y permiten practicarlas', async () => {
     const { fixture, element } = await render();
-    element.querySelector<HTMLButtonElement>('[aria-label="Repasar mis dificultades"]')!.click();
+    element.querySelector<HTMLButtonElement>('.stat[data-tone="danger"]')!.click();
     await fixture.whenStable();
 
+    expect(getWords).toHaveBeenCalledTimes(1);
+    const sheet = element.querySelector('app-word-group-sheet')!;
+    expect(sheet.querySelector('.title')?.textContent).toContain('Difíciles · 1');
+    expect(sheet.querySelector('.words')?.textContent).toContain('difficult-word');
+    expect(sheet.querySelector('.words')?.textContent).not.toContain('learning-word');
+
+    [...sheet.querySelectorAll('button')]
+      .find((b) => b.textContent?.includes('Practicarlas'))!
+      .click();
+    await fixture.whenStable();
+    await new Promise((resolve) => setTimeout(resolve));
+    await fixture.whenStable();
     expect(getQueue).toHaveBeenLastCalledWith('difficult', 20);
-    expect(element.textContent).toContain('1 tarjeta por orden de prioridad');
-    expect(element.querySelector<HTMLInputElement>('input[value="difficult"]')!.checked).toBe(true);
-
-    element.querySelector<HTMLButtonElement>('[aria-label="Ver repaso inteligente"]')!.click();
-    await fixture.whenStable();
-    expect(getQueue).toHaveBeenLastCalledWith('smart', 20);
-    expect(element.textContent).toContain('3 tarjetas por orden de prioridad');
-    expect(element.querySelector('a.stat-action')?.getAttribute('href')).toBe('/progress');
+    expect(element.querySelector('app-flashcard-session')).not.toBeNull();
   });
 
-  it('los consejos se navegan manualmente sin cambiar el modo de repaso', async () => {
-    const { fixture, element } = await render();
-    const previous = element.querySelector<HTMLButtonElement>('[aria-label="Consejo anterior"]')!;
-    const next = element.querySelector<HTMLButtonElement>('[aria-label="Consejo siguiente"]')!;
-    expect(previous.disabled).toBe(true);
-    expect(element.querySelector('.featured-tip h3')?.textContent).toBe('Sé constante');
-
-    next.click();
-    await fixture.whenStable();
-    expect(element.querySelector('.featured-tip h3')?.textContent).toBe('Enfócate en lo difícil');
-    next.click();
-    await fixture.whenStable();
-    expect(next.disabled).toBe(true);
-    expect(element.querySelector('.counter')?.textContent?.trim()).toBe('3 / 3');
-
-    element.querySelector<HTMLButtonElement>('.tip-pages button')!.click();
-    await fixture.whenStable();
-    expect(previous.disabled).toBe(true);
-    expect(element.querySelector<HTMLInputElement>('input[value="smart"]')!.checked).toBe(true);
-    expect(getQueue).toHaveBeenCalledTimes(1);
+  it('muestra un único consejo del día', async () => {
+    const { element } = await render();
+    expect(element.querySelector('#daily-tip-title')?.textContent).toBe('Consejo del día');
+    expect(element.querySelectorAll('.tip h3')).toHaveLength(1);
   });
 
   it('15 · sin palabras aprendidas explica cómo se consiguen', async () => {

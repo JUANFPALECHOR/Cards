@@ -66,25 +66,40 @@
   background: linear-gradient(135deg, #e66c69, #cb1222);
 }
 
-.tips {
+.tip {
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
   margin-top: -0.25rem;
-  padding: 1.75rem;
+  padding: 1.5rem;
   border: 1px solid var(--color-border);
   border-radius: 1.75rem;
   background: var(--color-surface);
   box-shadow: 0 12px 40px -16px rgb(76 38 48 / 0.14);
+
+  h3 {
+    font-size: 1.0625rem;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.4;
+  }
+  p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
 }
 
-.tips-header {
+.tip-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.625rem;
-  margin-bottom: 1.5rem;
+  gap: 0.5rem 0.625rem;
+  margin-bottom: 0.25rem;
 
   h2 {
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: var(--font-weight-bold);
   }
 }
@@ -93,107 +108,33 @@
   display: grid;
   place-items: center;
   width: 2.25rem;
-  height: 2.5rem;
+  height: 2.25rem;
   flex-shrink: 0;
   color: var(--color-on-warning-soft);
   background: var(--color-warning-soft);
   border-radius: 0.875rem;
 }
 
-.counter {
+.kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
   margin-left: auto;
-  font-size: 0.8125rem;
-  font-weight: var(--font-weight-medium);
-  white-space: nowrap;
-}
-.tip-navigation {
-  display: flex;
-  gap: 0.375rem;
-  margin-left: 0.25rem;
-
-  button {
-    color: var(--color-primary);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-sm);
-
-    &:disabled {
-      color: var(--color-text-muted);
-      opacity: 0.5;
-      cursor: default;
-    }
-  }
-}
-
-.featured-tip,
-.tip-row {
-  display: grid;
-  grid-template-columns: 4rem minmax(0, 1fr);
-  gap: 1.125rem;
-}
-.featured-tip {
-  min-height: 5rem;
-}
-.tip-icon {
-  display: grid;
-  place-items: center;
-  width: 4rem;
-  height: 4rem;
-  color: var(--color-primary);
-  background: linear-gradient(130deg, var(--color-primary-soft), var(--color-surface));
-  border-radius: 1.25rem;
-}
-h3 {
-  font-size: 0.875rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
   font-weight: var(--font-weight-semibold);
-  line-height: 1.5;
+  color: var(--color-on-primary-soft);
+  background: var(--color-primary-soft);
+  border-radius: var(--radius-full);
 }
-.featured-tip h3 {
-  font-size: 1rem;
-  font-weight: var(--font-weight-bold);
-}
-p {
-  margin-top: 0.125rem;
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: var(--color-text-muted);
-}
-.tip-row {
-  padding-block: 0.875rem;
-  border-top: 1px solid var(--color-border);
-}
-.tip-row:last-child {
-  padding-bottom: 0.5rem;
-}
-.tip-pages {
-  display: flex;
-  gap: 0.375rem;
-  margin-left: 5.125rem;
 
-  button {
-    display: grid;
-    align-items: center;
-    width: 2rem;
-    height: 2.75rem;
-    padding: 0;
-    background: transparent;
-    border: 0;
-    border-radius: 0.25rem;
-    cursor: pointer;
-
-    &::after {
-      content: '';
-      height: 0.375rem;
-      border-radius: 1rem;
-      background: var(--color-border-strong);
-    }
-    &[aria-pressed='true']::after {
-      background: var(--color-primary);
-    }
-    &:focus-visible {
-      @include focus-ring;
-    }
-  }
+.tip .example {
+  padding: 0.75rem 1rem;
+  font-style: italic;
+  color: var(--color-text);
+  background: var(--color-surface-sunken);
+  border-left: 3px solid var(--color-primary);
+  border-radius: 0.25rem 0.75rem 0.75rem 0.25rem;
 }
 
 :host-context([data-theme='dark']) .orb {
@@ -204,7 +145,7 @@ p {
   .mascot {
     height: 24rem;
   }
-  .tips {
+  .tip {
     padding: 1.25rem;
   }
 }
@@ -216,34 +157,13 @@ p {
     width: 100%;
   }
   .mascot {
-    height: 22rem;
-    max-width: 28rem;
-    margin-inline: auto;
+    display: none;
   }
 }
 
 @include down(sm) {
-  .mascot {
-    display: none;
-  }
-  .tips {
+  .tip {
     padding: 1.125rem;
-    border-radius: 1.5rem;
-  }
-  .tips-header {
-    gap: 0.5rem;
-  }
-  .featured-tip,
-  .tip-row {
-    grid-template-columns: 3rem minmax(0, 1fr);
-    gap: 0.75rem;
-  }
-  .tip-icon {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 1rem;
-  }
-  .tip-pages {
-    margin-left: 3.75rem;
+    border-radius: 1.25rem;
   }
 }

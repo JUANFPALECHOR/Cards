@@ -89,6 +89,20 @@ export const routes: Routes = [
             (m) => m.ProgressPage,
           ),
       },
+      {
+        path: 'progress/words',
+        title: pageTitle('Avance por palabra'),
+        loadComponent: () =>
+          import('./features/progress/pages/word-progress-page/word-progress-page').then(
+            (m) => m.WordProgressPage,
+          ),
+      },
+      {
+        path: 'match',
+        title: pageTitle('Emparejar'),
+        loadComponent: () =>
+          import('./features/match-game/pages/match-page/match-page').then((m) => m.MatchPage),
+      },
     ],
   },
   ...devRoutes,

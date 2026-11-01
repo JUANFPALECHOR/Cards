@@ -21,6 +21,7 @@ import { ConfirmDialog } from '../../ui/organisms/confirm-dialog/confirm-dialog'
 export const MAIN_NAV: readonly NavItem[] = [
   { label: 'Conjuntos', path: '/sets', icon: 'stack' },
   { label: 'Repasar', path: '/review', icon: 'repeat' },
+  { label: 'Emparejar', path: '/match', icon: 'bolt' },
   { label: 'Progreso', path: '/progress', icon: 'chart' },
 ];
 

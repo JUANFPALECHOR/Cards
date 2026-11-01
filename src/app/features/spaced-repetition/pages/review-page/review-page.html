@@ -12,8 +12,8 @@
     @switch (status()) {
       @case ('loading') {
         <div class="stats" aria-busy="true" aria-label="Cargando repasos">
-          @for (item of [1, 2, 3, 4]; track item) {
-            <app-skeleton height="8rem" radius="var(--radius-xl)" />
+          @for (item of [1, 2, 3]; track item) {
+            <app-skeleton height="6.5rem" radius="var(--radius-xl)" />
           }
         </div>
       }
@@ -40,77 +40,7 @@
           @switch (phase()) {
             @case ('setup') {
               @if (overview(); as o) {
-                <div class="stats">
-                  <app-stat-tile
-                    label="Pendientes"
-                    layout="row"
-                    icon="clock"
-                    tone="warning"
-                    [value]="o.dueNow"
-                    caption="Toca repasarlas ya"
-                  >
-                    <button
-                      class="stat-action"
-                      type="button"
-                      aria-label="Ver repaso inteligente"
-                      (click)="selectMode('smart')"
-                    >
-                      <app-icon name="chevron-right" />
-                    </button>
-                  </app-stat-tile>
-                  <app-stat-tile
-                    label="Difíciles"
-                    layout="row"
-                    icon="alert"
-                    tone="danger"
-                    [value]="o.counts.difficult"
-                    caption="Las que más te cuestan"
-                  >
-                    <button
-                      class="stat-action"
-                      type="button"
-                      aria-label="Repasar mis dificultades"
-                      (click)="selectMode('difficult')"
-                    >
-                      <app-icon name="chevron-right" />
-                    </button>
-                  </app-stat-tile>
-                  <app-stat-tile
-                    label="Dominadas"
-                    layout="row"
-                    icon="star"
-                    tone="success"
-                    [value]="masteredCount()"
-                    [caption]="
-                      o.counts.learned + ' aprendidas · ' + o.counts.provisional + ' por comprobar'
-                    "
-                  >
-                    <a
-                      class="stat-action"
-                      routerLink="/progress"
-                      aria-label="Ver el progreso de mis palabras dominadas"
-                    >
-                      <app-icon name="chevron-right" />
-                    </a>
-                  </app-stat-tile>
-                  <app-stat-tile
-                    label="Próximo repaso"
-                    layout="row"
-                    icon="calendar"
-                    tone="info"
-                    [value]="nextDueLabel() ?? '—'"
-                    [caption]="o.dueTomorrow + ' para mañana'"
-                  >
-                    <button
-                      class="stat-action"
-                      type="button"
-                      aria-label="Ver el próximo repaso"
-                      (click)="selectMode('smart')"
-                    >
-                      <app-icon name="chevron-right" />
-                    </button>
-                  </app-stat-tile>
-                </div>
+                <app-review-stats class="stats" [overview]="o" (selected)="openSheet($event)" />
               }
 
               <div class="setup">
@@ -233,3 +163,10 @@
     <app-review-companion />
   }
 </div>
+
+<app-word-group-sheet
+  [group]="sheet()"
+  [words]="sheetWords()"
+  (closed)="sheet.set(null)"
+  (practice)="practice($event)"
+/>

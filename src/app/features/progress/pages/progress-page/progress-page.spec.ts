@@ -39,14 +39,7 @@ function data(overrides: Partial<ProgressData> = {}): ProgressData {
       learnedToday: 0,
     },
     studyDays: [],
-    weekly: [
-      { weekStart: '2026-10-19', answers: 0, correct: 0, mastered: 0, learned: 0 },
-      { weekStart: '2026-10-26', answers: 40, correct: 30, mastered: 6, learned: 4 },
-    ],
     attention: [{ itemId: 'a', term: 'Achieve', translation: 'lograr', state: difficultState }],
-    masteredToday: [],
-    recentlyLearned: [],
-    recentAttempts: [],
     ...overrides,
   };
 }

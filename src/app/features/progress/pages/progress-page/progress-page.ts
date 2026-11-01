@@ -8,12 +8,9 @@ import { EmptyState } from '../../../../shared/ui/molecules/empty-state/empty-st
 import { PageHeader } from '../../../../shared/ui/molecules/page-header/page-header';
 import { SegmentedBar } from '../../../../shared/ui/molecules/segmented-bar/segmented-bar';
 import { StatTile } from '../../../../shared/ui/molecules/stat-tile/stat-tile';
-import { formatDueDay } from '../../../../shared/utils/dates';
 import { pluralize } from '../../../../shared/utils/text';
 import { difficultyReasons } from '../../../spaced-repetition/domain/learning-state';
-import { LEARNING_CONFIG } from '../../../spaced-repetition/srs-algorithm';
-import { RecentAttempts } from '../../components/recent-attempts/recent-attempts';
-import { WeeklyChart } from '../../components/weekly-chart/weekly-chart';
+import { ProgressCriteria } from '../../components/progress-criteria/progress-criteria';
 import { ProgressData, ProgressRepository } from '../../data/progress.repository';
 import { buildProgressSummary } from '../../domain/progress-stats';
 import { statusSegments } from '../../domain/status-segments';
@@ -32,20 +29,18 @@ type PageStatus = 'loading' | 'ready' | 'error';
     PageHeader,
     SegmentedBar,
     StatTile,
-    RecentAttempts,
-    WeeklyChart,
+    ProgressCriteria,
   ],
   templateUrl: './progress-page.html',
   styleUrl: './progress-page.scss',
 })
 export class ProgressPage {
   private readonly repository = inject(ProgressRepository);
-  protected readonly config = inject(LEARNING_CONFIG);
 
   protected readonly status = signal<PageStatus>('loading');
   protected readonly error = signal<string | null>(null);
   protected readonly data = signal<ProgressData | null>(null);
-  protected readonly skeletons = [1, 2, 3, 4];
+  protected readonly skeletons = [1, 2];
 
   protected readonly summary = computed(() => {
     const data = this.data();
@@ -82,15 +77,6 @@ export class ProgressPage {
       : `${days} · estudia hoy para mantenerla`;
   });
 
-  protected readonly dueCaption = computed(() => {
-    const summary = this.summary();
-    if (!summary) return null;
-    if (summary.dueNow > 0) return 'Listas para repasar ahora';
-    return summary.nextDueAt
-      ? `Próximo repaso: ${formatDueDay(summary.nextDueAt)}`
-      : 'Nada programado';
-  });
-
   constructor() {
     void this.load();
   }
@@ -105,10 +91,6 @@ export class ProgressPage {
 
   protected reasonOf(word: ProgressData['attention'][number]): string {
     return difficultyReasons(word.state)[0] ?? 'Ha tenido errores últimamente.';
-  }
-
-  protected dueLabel(date: Date): string {
-    return formatDueDay(date);
   }
 
   private async load(): Promise<void> {

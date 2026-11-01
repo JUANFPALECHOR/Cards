@@ -1,0 +1,171 @@
+@switch (status()) {
+  @case ('loading') {
+    <div aria-busy="true" aria-label="Cargando vocabulario">
+      <app-skeleton width="50%" height="2.5rem" />
+      <app-skeleton height="16rem" radius="var(--radius-xl)" style="margin-top: var(--space-6)" />
+    </div>
+  }
+  @case ('error') {
+    <app-empty-state
+      tone="danger"
+      icon="alert"
+      title="No pudimos cargar tu vocabulario"
+      [description]="error()"
+    >
+      <button appButton variant="secondary" type="button" (click)="reload()">Reintentar</button>
+    </app-empty-state>
+  }
+  @case ('ready') {
+    @if (pairs().length < minPairs) {
+      <app-empty-state
+        icon="bolt"
+        title="Necesitas más palabras"
+        [description]="
+          'Para emparejar hacen falta al menos ' +
+          minPairs +
+          ' palabras con traducciones distintas. Tienes ' +
+          pairs().length +
+          '.'
+        "
+      >
+        <a appButton routerLink="/sets">Agregar vocabulario</a>
+      </app-empty-state>
+    } @else {
+      @switch (phase()) {
+        @case ('intro') {
+          <section class="card intro" aria-labelledby="match-title">
+            <span class="hero-icon"><app-icon name="bolt" [size]="28" /></span>
+            <h1 id="match-title">Emparejar</h1>
+            <p class="lead">
+              Une cada palabra en inglés con su traducción. Cada pareja acertada se reemplaza por
+              otra de tus {{ pairs().length }} palabras.
+            </p>
+            <ol class="checkpoints">
+              @for (item of preview; track item.level) {
+                <li>
+                  <strong>Checkpoint {{ item.level }}</strong>
+                  <span>{{ item.target }} parejas · {{ formatClock(item.seconds) }}</span>
+                </li>
+              }
+              <li class="more"><span>Y cada vez más…</span></li>
+            </ol>
+            <p class="rules">
+              Si se acaba el tiempo, termina la partida. Cada error resta
+              {{ penalty.seconds }} segundos y {{ penalty.points }} puntos.
+            </p>
+            <button appButton size="lg" type="button" class="primary-action" (click)="startGame()">
+              Empezar
+            </button>
+          </section>
+        }
+        @case ('playing') {
+          <section class="game" aria-label="Partida en curso">
+            <div class="hud">
+              <div class="hud-item">
+                <span class="hud-label">Checkpoint {{ checkpoint().level }}</span>
+                <span class="hud-value">{{ matched() }} / {{ checkpoint().target }}</span>
+              </div>
+              <div class="hud-item timer" [class.is-low]="lowTime()">
+                <app-icon name="clock" [size]="18" />
+                <span class="hud-value" role="timer" aria-label="Tiempo restante">{{
+                  timeLabel()
+                }}</span>
+              </div>
+              <div class="hud-item score">
+                <span class="hud-label">Puntos</span>
+                <span class="hud-value">{{ score() }}</span>
+              </div>
+            </div>
+            <app-progress-bar
+              class="goal"
+              label="Parejas completadas en este checkpoint"
+              [value]="matched()"
+              [max]="checkpoint().target"
+            />
+
+            @if (board(); as b) {
+              <app-match-board
+                [board]="b"
+                [selected]="selected()"
+                [wrong]="wrong()"
+                (picked)="pick($event.side, $event.index)"
+              />
+            }
+            <p class="combo" aria-live="polite">
+              @if (combo() > 1) {
+                ¡{{ combo() }} seguidas!
+              }
+            </p>
+          </section>
+        }
+        @case ('cleared') {
+          <section class="card result" aria-labelledby="cleared-title" role="status">
+            <span class="hero-icon is-success"><app-icon name="check" [size]="28" /></span>
+            <h1 id="cleared-title">¡Checkpoint {{ checkpoint().level }} superado!</h1>
+            <dl class="stats">
+              <div>
+                <dt>Puntos</dt>
+                <dd>{{ score() }}</dd>
+              </div>
+              <div>
+                <dt>Bonus de tiempo</dt>
+                <dd>+{{ lastBonus() }}</dd>
+              </div>
+              <div>
+                <dt>Precisión</dt>
+                <dd>{{ accuracy() }}%</dd>
+              </div>
+            </dl>
+            <p class="lead">
+              Siguiente: {{ nextCheckpoint().target }} parejas en
+              {{ formatClock(nextCheckpoint().seconds) }}.
+            </p>
+            <button
+              appButton
+              size="lg"
+              type="button"
+              class="primary-action"
+              (click)="continueGame()"
+            >
+              Continuar
+            </button>
+          </section>
+        }
+        @case ('over') {
+          <section class="card result" aria-labelledby="over-title" role="status">
+            <span class="hero-icon is-danger"><app-icon name="clock" [size]="28" /></span>
+            <h1 id="over-title">Se acabó el tiempo</h1>
+            <dl class="stats">
+              <div>
+                <dt>Puntos</dt>
+                <dd>{{ score() }}</dd>
+              </div>
+              <div>
+                <dt>Checkpoints</dt>
+                <dd>{{ level() - 1 }}</dd>
+              </div>
+              <div>
+                <dt>Parejas</dt>
+                <dd>{{ totalMatched() }}</dd>
+              </div>
+              <div>
+                <dt>Precisión</dt>
+                <dd>{{ accuracy() }}%</dd>
+              </div>
+            </dl>
+            <p class="lead">
+              Llegaste a {{ matched() }} de {{ checkpoint().target }} parejas en el checkpoint
+              {{ checkpoint().level }}.
+            </p>
+            <div class="actions">
+              <button appButton size="lg" type="button" (click)="startGame()">
+                Jugar otra vez
+              </button>
+              <a appButton size="lg" variant="secondary" routerLink="/review">Ir a Repasar</a>
+            </div>
+          </section>
+        }
+      }
+    }
+  }
+}

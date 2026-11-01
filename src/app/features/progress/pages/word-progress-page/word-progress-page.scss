@@ -1,0 +1,231 @@
+@use 'mixins' as *;
+
+.filters {
+  --segment-columns: repeat(3, minmax(0, 1fr));
+  display: block;
+  margin-bottom: var(--space-4);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.word {
+  --status-color: var(--color-status-learning);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+
+  &[data-status='new'] {
+    --status-color: var(--color-status-new);
+  }
+  &[data-status='difficult'] {
+    --status-color: var(--color-status-difficult);
+  }
+  &[data-status='provisional'] {
+    --status-color: var(--color-status-provisional);
+  }
+  &[data-status='learned'] {
+    --status-color: var(--color-status-learned);
+  }
+
+  summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    list-style: none;
+    cursor: pointer;
+    border-radius: inherit;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  &[open] .chevron {
+    transform: rotate(180deg);
+  }
+}
+
+.word-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+  min-width: 0;
+}
+
+.term {
+  font-weight: var(--font-weight-semibold);
+}
+
+.translation {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.word-text {
+  grid-area: 1 / 1;
+}
+
+.percent {
+  grid-area: 1 / 2;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.chevron {
+  grid-area: 1 / 3;
+  color: var(--color-text-subtle);
+  transition: transform 200ms var(--ease-out);
+}
+
+.word-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  flex-shrink: 0;
+  min-width: 6.5rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+.dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  background: var(--status-color);
+  border-radius: 3px;
+}
+
+.bar {
+  flex: 1;
+  height: 0.375rem;
+  overflow: hidden;
+  background: var(--color-surface-sunken);
+  border-radius: var(--radius-full);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: var(--status-color);
+  border-radius: inherit;
+  transform-origin: left center;
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-4);
+  font-size: var(--font-size-sm);
+}
+
+.reason {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-on-danger-soft);
+  background: var(--color-danger-soft);
+  border-radius: var(--radius-md);
+}
+
+.group-title {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.requirements {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--space-3);
+    padding-block: var(--space-2);
+
+    & + li {
+      border-top: 1px solid var(--color-border);
+    }
+  }
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.1rem;
+  border: 2px solid var(--color-border-strong);
+  border-radius: 50%;
+
+  .is-done & {
+    color: var(--color-surface);
+    background: var(--color-success);
+    border-color: var(--color-success);
+  }
+}
+
+.requirement {
+  display: flex;
+  flex-direction: column;
+}
+
+.ready {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.requirement-detail {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  .is-done & {
+    color: var(--color-on-success-soft);
+  }
+}
+
+.next {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.footnote {
+  margin-top: var(--space-5);
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}

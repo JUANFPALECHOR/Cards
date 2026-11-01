@@ -1,0 +1,131 @@
+<a class="back-link" routerLink="/progress"><app-icon name="arrow-left" [size]="18" /> Progreso</a>
+
+<app-page-header
+  title="Avance por palabra"
+  description="Qué ha cumplido cada palabra y qué le falta para dominarla y aprenderla."
+/>
+
+@switch (status()) {
+  @case ('loading') {
+    <div class="list" aria-busy="true" aria-label="Cargando palabras">
+      @for (item of [1, 2, 3, 4]; track item) {
+        <app-skeleton height="4.5rem" radius="var(--radius-lg)" />
+      }
+    </div>
+  }
+  @case ('error') {
+    <app-empty-state
+      tone="danger"
+      icon="alert"
+      title="No pudimos cargar tus palabras"
+      [description]="error()"
+    >
+      <button appButton variant="secondary" type="button" (click)="reload()">Reintentar</button>
+    </app-empty-state>
+  }
+  @case ('ready') {
+    <app-segmented-control
+      class="filters"
+      legend="Mostrar"
+      [options]="options()"
+      [value]="filter()"
+      (valueChange)="setFilter($event)"
+    />
+
+    @if (visible().length === 0) {
+      <app-empty-state
+        [icon]="filter() === 'difficult' ? 'check' : 'book'"
+        [tone]="filter() === 'difficult' ? 'success' : 'primary'"
+        [title]="
+          filter() === 'difficult'
+            ? 'Ninguna palabra con errores'
+            : filter() === 'near'
+              ? 'Nada en camino por ahora'
+              : 'Aún no tienes vocabulario'
+        "
+        [description]="
+          filter() === 'all'
+            ? 'Agrega palabras a un conjunto para empezar.'
+            : 'Practica en flashcards, cuestionarios o Repasar y aparecerán aquí.'
+        "
+      />
+    } @else {
+      <ul class="list">
+        @for (row of visible(); track row.itemId) {
+          <li>
+            <details class="word" [attr.data-status]="row.progress.status">
+              <summary>
+                <span class="word-text">
+                  <span class="term" lang="en">{{ row.term }}</span>
+                  <span class="translation" lang="es">{{ row.translation }}</span>
+                </span>
+                <span class="percent">{{ row.progress.percent }}%</span>
+                <span class="word-meta">
+                  <span class="status"
+                    ><span class="dot"></span>{{ statusLabels[row.progress.status] }}</span
+                  >
+                  <span class="bar" aria-hidden="true">
+                    <span
+                      class="fill"
+                      [style.transform]="'scaleX(' + row.progress.percent / 100 + ')'"
+                    ></span>
+                  </span>
+                </span>
+                <app-icon class="chevron" name="chevron-down" [size]="18" />
+              </summary>
+
+              <div class="detail">
+                @if (row.reason; as reason) {
+                  <p class="reason"><app-icon name="alert" [size]="16" /> {{ reason }}</p>
+                }
+                @for (group of [row.mastered, row.learned]; track $index) {
+                  <h3 class="group-title">
+                    {{ $index === 0 ? 'Para dominarla' : 'Para aprenderla' }}
+                  </h3>
+                  <ul class="requirements">
+                    @for (item of group; track item.key) {
+                      <li [class.is-done]="item.done">
+                        <span class="check" aria-hidden="true">
+                          @if (item.done) {
+                            <app-icon name="check" [size]="14" />
+                          }
+                        </span>
+                        <span class="requirement">
+                          <span class="requirement-label">
+                            {{ item.label }}
+                            <span class="sr-only">{{
+                              item.done ? '(cumplido)' : '(pendiente)'
+                            }}</span>
+                          </span>
+                          @if (readyLabel(item); as ready) {
+                            <span class="ready">{{ ready }}</span>
+                          }
+                        </span>
+                        <span class="requirement-detail">{{
+                          item.done ? 'Listo' : item.detail
+                        }}</span>
+                      </li>
+                    }
+                  </ul>
+                }
+                @if (row.state; as state) {
+                  <p class="next">
+                    <app-icon name="calendar" [size]="16" /> Próximo repaso:
+                    {{ dueLabel(state.dueAt) }}
+                  </p>
+                }
+              </div>
+            </details>
+          </li>
+        }
+      </ul>
+    }
+
+    <p class="footnote">
+      El avance es el promedio de lo cumplido en cada requisito. Puntos por acierto: escribir 1 ·
+      flashcard {{ config.kindWeight.self_assessment.toLocaleString('es') }} · selección múltiple
+      {{ config.kindWeight.multiple_choice.toLocaleString('es') }}; «Me costó» vale la mitad. Un
+      fallo reinicia la racha y la retención, y reduce el dominio a la mitad.
+    </p>
+  }
+}
