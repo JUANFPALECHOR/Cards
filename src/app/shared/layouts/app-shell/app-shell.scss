@@ -86,6 +86,69 @@
   --color-topbar: rgb(23 19 28 / 0.92);
 }
 
+// Acceso y registro comparten el mismo escenario y la barra de marca existente.
+:host:has(app-auth-page) {
+  --container-max: 93rem;
+  --topbar-height: 3.75rem;
+  --color-bg: #f5f9ff;
+  --color-text: #0a1b3a;
+  --color-text-muted: #536789;
+  --color-text-subtle: #637696;
+  --color-primary: #0058df;
+  --color-primary-hover: #0042ab;
+  --color-primary-soft: #e1eeff;
+  --color-on-primary-soft: #004cbf;
+  --color-accent: #e6252d;
+  --color-border: #dce7f7;
+  --color-border-input: #9bb2d7;
+  --color-focus-ring: #0058df;
+  --color-topbar: rgb(248 251 255 / 0.94);
+  color: var(--color-text);
+  background: var(--color-bg);
+
+  main {
+    display: grid;
+    align-items: center;
+    padding-top: 4rem;
+    padding-bottom: 6rem;
+  }
+
+  @include down(lg) {
+    main {
+      align-items: start;
+      padding-top: 3rem;
+      padding-bottom: 5rem;
+    }
+  }
+
+  @include down(sm) {
+    main {
+      padding-top: 1.5rem;
+      padding-bottom: 4rem;
+    }
+  }
+}
+
+:host-context([data-theme='dark']):has(app-auth-page) {
+  --color-bg: #0d1628;
+  --color-surface: #15223a;
+  --color-surface-sunken: #101c30;
+  --color-text: #eef4ff;
+  --color-text-muted: #b0bfd8;
+  --color-text-subtle: #9cafd0;
+  --color-primary: #7db2ff;
+  --color-primary-hover: #a3c9ff;
+  --color-on-primary: #071c3d;
+  --color-primary-soft: #203b63;
+  --color-on-primary-soft: #b0d0ff;
+  --color-border: #2f4363;
+  --color-border-input: #5c789f;
+  --color-accent: #fa6670;
+  --color-focus-ring: #7db2ff;
+  --color-topbar: rgb(13 22 40 / 0.94);
+  --auth-card-border: #365582;
+}
+
 main {
   flex: 1;
   padding-top: var(--space-6);

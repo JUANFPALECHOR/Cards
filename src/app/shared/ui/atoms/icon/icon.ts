@@ -37,7 +37,12 @@ export type IconName =
   | 'play'
   | 'wave'
   | 'star'
-  | 'bolt';
+  | 'bolt'
+  | 'lock'
+  | 'eye'
+  | 'eye-off'
+  | 'login'
+  | 'user-plus';
 
 /**
  * Iconos SVG inline (trazo de 24px, sin dependencias). Decorativos por defecto:
@@ -72,6 +77,26 @@ export type IconName =
       focusable="false"
     >
       @switch (name()) {
+        @case ('lock') {
+          <rect x="5" y="10" width="14" height="11" rx="2" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3M12 15v2" />
+        }
+        @case ('eye') {
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+          <circle cx="12" cy="12" r="3" />
+        }
+        @case ('eye-off') {
+          <path
+            d="m3 3 18 18M10.6 5.1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-3.2 4M6.3 6.3A18 18 0 0 0 2 12s3.5 7 10 7a11 11 0 0 0 5.7-1.7M9.9 9.9a3 3 0 0 0 4.2 4.2"
+          />
+        }
+        @case ('login') {
+          <path d="M10 4h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-8M3 12h11m-4-4 4 4-4 4" />
+        }
+        @case ('user-plus') {
+          <circle cx="9" cy="7" r="4" />
+          <path d="M2 21v-2a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v2H2ZM19 7v6M16 10h6" />
+        }
         @case ('stack') {
           <rect x="3" y="8" width="13" height="13" rx="3" />
           <path d="M8 4h9a3 3 0 0 1 3 3v9" />

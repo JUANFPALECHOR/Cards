@@ -80,6 +80,65 @@ describe('AuthPage', () => {
     expect(auth.signIn).not.toHaveBeenCalled();
   });
 
+  it('permite mostrar y ocultar la contraseña sin enviarla ni perder su valor', async () => {
+    const element = create('login');
+    type(element, 'Contraseña', 'secreta123');
+    fixture.detectChanges();
+    const password = element.querySelector<HTMLInputElement>('[formControlName="password"]')!;
+    const toggle = element.querySelector<HTMLButtonElement>('[aria-label="Mostrar contraseña"]')!;
+
+    expect(password.type).toBe('password');
+    expect(toggle.getAttribute('aria-controls')).toBe(password.id);
+    toggle.click();
+    await fixture.whenStable();
+    expect(password.type).toBe('text');
+    expect(password.value).toBe('secreta123');
+    expect(password.autocomplete).toBe('current-password');
+    expect(toggle.getAttribute('aria-label')).toBe('Ocultar contraseña');
+
+    toggle.click();
+    await fixture.whenStable();
+    expect(password.type).toBe('password');
+    expect(auth.signIn).not.toHaveBeenCalled();
+  });
+
+  it('la visibilidad de la confirmación es independiente y se restablece al cambiar de modo', async () => {
+    const element = create('register');
+    type(element, 'Contraseña', 'secreta123');
+    type(element, 'Repite', 'secreta123');
+    element
+      .querySelector<HTMLButtonElement>('[aria-label="Mostrar confirmación de contraseña"]')!
+      .click();
+    await fixture.whenStable();
+
+    expect(
+      element.querySelector<HTMLInputElement>('[formControlName="confirmPassword"]')!.type,
+    ).toBe('text');
+    expect(element.querySelector<HTMLInputElement>('[formControlName="password"]')!.type).toBe(
+      'password',
+    );
+    expect(auth.signUp).not.toHaveBeenCalled();
+
+    fixture.componentRef.setInput('mode', 'login');
+    await fixture.whenStable();
+    fixture.componentRef.setInput('mode', 'register');
+    await fixture.whenStable();
+    expect(
+      element.querySelector<HTMLInputElement>('[formControlName="confirmPassword"]')!.type,
+    ).toBe('password');
+  });
+
+  it('conserva la relación entre etiquetas, campos y errores dentro de los nuevos contenedores', async () => {
+    const element = create('login');
+    await submit(element);
+    const email = element.querySelector<HTMLInputElement>('[formControlName="email"]')!;
+    const field = email.closest('app-form-field')!;
+
+    expect(field.querySelector('label')!.htmlFor).toBe(email.id);
+    expect(email.getAttribute('aria-invalid')).toBe('true');
+    expect(email.getAttribute('aria-describedby')).toBe(field.querySelector('.error')!.id);
+  });
+
   it('muestra el mensaje del servidor cuando las credenciales fallan', async () => {
     auth.signIn.mockRejectedValue(new AppError('invalid-credentials'));
     const element = create('login');

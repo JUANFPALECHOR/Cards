@@ -5,8 +5,8 @@
 }
 
 .label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--field-label-size, var(--font-size-sm));
+  font-weight: var(--field-label-weight, var(--font-weight-medium));
   line-height: var(--line-height-snug);
   color: var(--color-text);
 }

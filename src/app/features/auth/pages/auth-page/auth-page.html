@@ -1,87 +1,178 @@
-<section class="auth">
-  @if (pendingConfirmation(); as address) {
-    <h1 class="sr-only">Revisa tu correo</h1>
-    <app-empty-state
-      icon="mail"
-      tone="success"
-      title="Revisa tu correo"
-      [description]="
-        'Enviamos un enlace de confirmación a ' + address + '. Ábrelo y después inicia sesión.'
-      "
-    >
-      <a appButton routerLink="/login">Ir a iniciar sesión</a>
-    </app-empty-state>
-  } @else {
-    <header class="header">
-      <h1>{{ isRegister() ? 'Crea tu cuenta' : 'Inicia sesión' }}</h1>
-      <p class="lead">
-        {{
-          isRegister()
-            ? 'Guarda tus conjuntos y tu progreso para estudiar desde cualquier dispositivo.'
-            : 'Entra para continuar con tus conjuntos y tu repaso.'
-        }}
-      </p>
-    </header>
-
-    <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <app-form-field label="Correo electrónico" [error]="emailError()" required>
-        <input
-          appInput
-          formControlName="email"
-          type="email"
-          inputmode="email"
-          autocomplete="email"
-          autocapitalize="none"
-          spellcheck="false"
-          enterkeyhint="next"
-          placeholder="nombre@correo.com"
-        />
-      </app-form-field>
-
-      <app-form-field
-        label="Contraseña"
-        [hint]="isRegister() ? 'Al menos ' + passwordMin + ' caracteres.' : null"
-        [error]="passwordError()"
-        required
+<app-auth-backdrop />
+<div class="auth-layout">
+  <app-auth-artwork />
+  <section class="auth" [class.is-register]="isRegister()" aria-labelledby="auth-title">
+    <app-auth-backdrop variant="corner" />
+    @if (pendingConfirmation(); as address) {
+      <h1 id="auth-title" class="sr-only">Revisa tu correo</h1>
+      <app-empty-state
+        icon="mail"
+        tone="success"
+        title="Revisa tu correo"
+        [description]="
+          'Enviamos un enlace de confirmación a ' + address + '. Ábrelo y después inicia sesión.'
+        "
       >
-        <input
-          appInput
-          formControlName="password"
-          type="password"
-          [attr.autocomplete]="isRegister() ? 'new-password' : 'current-password'"
-          [attr.enterkeyhint]="isRegister() ? 'next' : 'go'"
-        />
-      </app-form-field>
+        <a appButton routerLink="/login" [queryParams]="{ returnUrl: returnUrl() }"
+          >Ir a iniciar sesión</a
+        >
+      </app-empty-state>
+    } @else {
+      <header class="header">
+        <p class="eyebrow">
+          {{ isRegister() ? 'Tu aprendizaje empieza aquí' : 'Bienvenido de nuevo' }}
+        </p>
+        <h1 id="auth-title">
+          @if (isRegister()) {
+            Crea tu <span>cuenta</span>
+          } @else {
+            Inicia <span>sesión</span>
+          }
+        </h1>
+        <p class="lead">
+          {{
+            isRegister()
+              ? 'Guarda tus conjuntos y tu progreso para estudiar desde cualquier dispositivo.'
+              : 'Entra para continuar con tus conjuntos y tu repaso.'
+          }}
+        </p>
+      </header>
 
-      @if (isRegister()) {
-        <app-form-field label="Repite la contraseña" [error]="confirmError()" required>
-          <input
-            appInput
-            formControlName="confirmPassword"
-            type="password"
-            autocomplete="new-password"
-            enterkeyhint="go"
-          />
+      <form
+        class="card"
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        novalidate
+        [attr.aria-busy]="submitting()"
+      >
+        <app-form-field label="Correo electrónico" [error]="emailError()" required>
+          <div class="input-wrap">
+            <span class="field-icon"><app-icon name="mail" [size]="25" /></span>
+            <input
+              appInput
+              formControlName="email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              autocapitalize="none"
+              spellcheck="false"
+              enterkeyhint="next"
+              placeholder="nombre@correo.com"
+            />
+          </div>
         </app-form-field>
-      }
 
-      @if (serverError(); as message) {
-        <p class="form-error" role="alert">{{ message }}</p>
-      }
+        <app-form-field
+          #passwordField
+          label="Contraseña"
+          [hint]="isRegister() ? 'Al menos ' + passwordMin + ' caracteres.' : null"
+          [error]="passwordError()"
+          required
+        >
+          <div class="input-wrap has-toggle">
+            <span class="field-icon"><app-icon name="lock" [size]="25" /></span>
+            <input
+              appInput
+              formControlName="password"
+              [type]="passwordVisible() ? 'text' : 'password'"
+              [attr.autocomplete]="isRegister() ? 'new-password' : 'current-password'"
+              [attr.enterkeyhint]="isRegister() ? 'next' : 'go'"
+              placeholder="Tu contraseña"
+            />
+            <button
+              appIconButton
+              class="password-toggle"
+              [label]="passwordVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-controls]="passwordField.controlId"
+              (click)="passwordVisible.set(!passwordVisible())"
+            >
+              <app-icon [name]="passwordVisible() ? 'eye' : 'eye-off'" [size]="24" />
+            </button>
+          </div>
+        </app-form-field>
 
-      <button appButton type="submit" block [loading]="submitting()" [disabled]="submitting()">
-        {{ isRegister() ? 'Crear cuenta' : 'Iniciar sesión' }}
-      </button>
-    </form>
+        @if (isRegister()) {
+          <app-form-field
+            #confirmField
+            label="Repite la contraseña"
+            [error]="confirmError()"
+            required
+          >
+            <div class="input-wrap has-toggle">
+              <span class="field-icon"><app-icon name="lock" [size]="25" /></span>
+              <input
+                appInput
+                formControlName="confirmPassword"
+                [type]="confirmationVisible() ? 'text' : 'password'"
+                autocomplete="new-password"
+                enterkeyhint="go"
+                placeholder="Repite tu contraseña"
+              />
+              <button
+                appIconButton
+                class="password-toggle"
+                [label]="
+                  confirmationVisible()
+                    ? 'Ocultar confirmación de contraseña'
+                    : 'Mostrar confirmación de contraseña'
+                "
+                [attr.aria-controls]="confirmField.controlId"
+                (click)="confirmationVisible.set(!confirmationVisible())"
+              >
+                <app-icon [name]="confirmationVisible() ? 'eye' : 'eye-off'" [size]="24" />
+              </button>
+            </div>
+          </app-form-field>
+        } @else {
+          <p class="session-note">
+            <app-icon name="check-circle" [size]="18" /> Tu sesión se mantiene en este navegador.
+          </p>
+        }
 
-    <p class="switch">
+        @if (serverError(); as message) {
+          <p class="form-error" role="alert">{{ message }}</p>
+        }
+
+        <button
+          appButton
+          class="submit-button"
+          type="submit"
+          size="lg"
+          block
+          [loading]="submitting()"
+          [disabled]="submitting()"
+        >
+          <app-icon [name]="isRegister() ? 'user-plus' : 'login'" [size]="25" />
+          {{ isRegister() ? 'Crear cuenta' : 'Iniciar sesión' }}
+        </button>
+      </form>
+
+      <div class="divider"><span>o</span></div>
       @if (isRegister()) {
-        ¿Ya tienes cuenta?
-        <a routerLink="/login" [queryParams]="{ returnUrl: returnUrl() }">Inicia sesión</a>
+        <a
+          appButton
+          class="switch-button"
+          variant="secondary"
+          size="lg"
+          block
+          routerLink="/login"
+          [queryParams]="{ returnUrl: returnUrl() }"
+        >
+          <app-icon name="login" [size]="25" /> Iniciar sesión
+        </a>
       } @else {
-        ¿Todavía no tienes cuenta?
-        <a routerLink="/registro" [queryParams]="{ returnUrl: returnUrl() }">Crea una</a>
+        <a
+          appButton
+          class="switch-button"
+          variant="secondary"
+          size="lg"
+          block
+          routerLink="/registro"
+          [queryParams]="{ returnUrl: returnUrl() }"
+        >
+          <app-icon name="user-plus" [size]="25" /> Crear una cuenta
+        </a>
       }
-    </p>
-  }
-</section>
+    }
+  </section>
+</div>

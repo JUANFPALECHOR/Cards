@@ -15,10 +15,14 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { safeReturnUrl } from '../../../../core/auth/auth.guard';
 import { toAppError } from '../../../../core/supabase/app-error';
 import { Button } from '../../../../shared/ui/atoms/button/button';
+import { Icon } from '../../../../shared/ui/atoms/icon/icon';
+import { IconButton } from '../../../../shared/ui/atoms/icon-button/icon-button';
 import { InputControl } from '../../../../shared/ui/atoms/input/input';
 import { EmptyState } from '../../../../shared/ui/molecules/empty-state/empty-state';
 import { FormField } from '../../../../shared/ui/molecules/form-field/form-field';
 import { controlErrorMessage, requiredText } from '../../../../shared/utils/form-errors';
+import { AuthArtwork } from '../../components/auth-artwork/auth-artwork';
+import { AuthBackdrop } from '../../components/auth-backdrop/auth-backdrop';
 
 export type AuthMode = 'login' | 'register';
 
@@ -28,7 +32,18 @@ export const PASSWORD_MIN_LENGTH = 8;
 @Component({
   selector: 'app-auth-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink, Button, InputControl, FormField, EmptyState],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    Button,
+    Icon,
+    IconButton,
+    InputControl,
+    FormField,
+    EmptyState,
+    AuthArtwork,
+    AuthBackdrop,
+  ],
   templateUrl: './auth-page.html',
   styleUrl: './auth-page.scss',
 })
@@ -42,6 +57,8 @@ export class AuthPage {
 
   protected readonly passwordMin = PASSWORD_MIN_LENGTH;
   protected readonly isRegister = computed(() => this.mode() === 'register');
+  protected readonly passwordVisible = signal(false);
+  protected readonly confirmationVisible = signal(false);
 
   protected readonly form = new FormGroup({
     email: new FormControl('', {
@@ -90,6 +107,8 @@ export class AuthPage {
     effect(() => {
       const register = this.isRegister();
       untracked(() => {
+        this.passwordVisible.set(false);
+        this.confirmationVisible.set(false);
         const { password } = this.form.controls;
         password.setValidators(
           register
